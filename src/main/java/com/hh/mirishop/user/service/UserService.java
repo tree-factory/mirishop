@@ -3,6 +3,8 @@ package com.hh.mirishop.user.service;
 import static com.hh.mirishop.user.exception.UserExceptionMessage.DUPLICATED_EMAIL;
 import static com.hh.mirishop.user.exception.UserExceptionMessage.INVALID_EMAIL_FROM;
 
+import com.hh.mirishop.email.service.EmailService;
+import com.hh.mirishop.redis.service.RedisService;
 import com.hh.mirishop.user.domain.User;
 import com.hh.mirishop.user.dto.UserRequest;
 import com.hh.mirishop.user.repository.UserRepository;
@@ -18,6 +20,8 @@ public class UserService {
     private final static Pattern EMAIL_REGEX = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
 
     private final UserRepository userRepository;
+    private final EmailService emailService;
+    private final RedisService redisService;
 
     @Transactional
     public Long register(final UserRequest userRequest) {
