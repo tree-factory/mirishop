@@ -8,15 +8,19 @@ import static com.hh.mirishop.user.exception.UserExceptionMessage.INVALID_PASSWO
 import com.hh.mirishop.user.domain.User;
 import com.hh.mirishop.user.dto.UserRequest;
 import com.hh.mirishop.user.repository.UserRepository;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.regex.Pattern;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    // 기본 이미지 경로는 추후 업로드 방식이 변경되면 수정 필요
+    private static final String DEFAULT_PROFILE_IMAGE_PATH = "/uploads/images/default.jpg";
 
     private final static Pattern EMAIL_REGEX = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
 
@@ -28,9 +32,11 @@ public class UserService {
     public Long register(final UserRequest userRequest) {
         String email = userRequest.getEmail();
         String password = userRequest.getPassword();
+        String profileImagePath = userRequest.getProfileImage();
 
         validateEmail(email);
         validatePassword(password);
+        validateUploadProfileImage(profileImagePath);
 
         String encodedPassword = encodePassword(password);
 
@@ -46,6 +52,8 @@ public class UserService {
 
         return userEntity.getId();
     }
+
+
 
     private void validateEmail(String email) {
         validatedEmailForm(email);
@@ -65,13 +73,19 @@ public class UserService {
                 });
     }
 
+    private void validatePassword(String password) {
+        if (password.length() < USER_PASSWORD_LENGTH) {
+            throw new IllegalArgumentException(INVALID_PASSWORD_LENGTH.getMessage());
+        }
+    }
+
     private String encodePassword(String password) {
         return bCryptPasswordEncoder.encode(password);
     }
 
-    private void validatePassword(String password) {
-        if (password.length() < USER_PASSWORD_LENGTH) {
-            throw new IllegalArgumentException(INVALID_PASSWORD_LENGTH.getMessage());
-        };
+    private static void validateUploadProfileImage(String profileImagePath) {
+        if (profileImagePath == null || profileImagePath.isEmpty()) {
+            profileImagePath = DEFAULT_PROFILE_IMAGE_PATH;
+        }
     }
 }
