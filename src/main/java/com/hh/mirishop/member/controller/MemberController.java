@@ -1,11 +1,11 @@
-package com.hh.mirishop.user.controller;
+package com.hh.mirishop.member.controller;
 
 
 import com.hh.mirishop.email.repository.EmailRequest;
 import com.hh.mirishop.email.service.EmailService;
-import com.hh.mirishop.user.dto.UserRequest;
-import com.hh.mirishop.user.service.ImageUploadService;
-import com.hh.mirishop.user.service.UserService;
+import com.hh.mirishop.member.dto.MemberRequest;
+import com.hh.mirishop.member.service.ImageUploadService;
+import com.hh.mirishop.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,17 +24,17 @@ import java.util.Collections;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/members")
 @RequiredArgsConstructor
-public class UserController {
+public class MemberController {
 
-    private final UserService userService;
+    private final MemberService memberService;
     private final EmailService emailService;
     private final ImageUploadService imageUploadService;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody @Valid final UserRequest userRequest) {
-        final Long userId = userService.register(userRequest);
+    public ResponseEntity<Object> register(@RequestBody @Valid final MemberRequest memberRequest) {
+        final Long userId = memberService.register(memberRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap("userId", userId));
@@ -78,6 +78,4 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 업로드에 실패했습니다.");
         }
     }
-
-
 }

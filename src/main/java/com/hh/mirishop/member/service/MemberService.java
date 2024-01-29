@@ -1,13 +1,13 @@
-package com.hh.mirishop.user.service;
+package com.hh.mirishop.member.service;
 
 import static com.hh.mirishop.common.Constants.USER_PASSWORD_LENGTH;
-import static com.hh.mirishop.user.exception.UserExceptionMessage.DUPLICATED_EMAIL;
-import static com.hh.mirishop.user.exception.UserExceptionMessage.INVALID_EMAIL_FROM;
-import static com.hh.mirishop.user.exception.UserExceptionMessage.INVALID_PASSWORD_LENGTH;
+import static com.hh.mirishop.member.exception.MemberExceptionMessage.DUPLICATED_EMAIL;
+import static com.hh.mirishop.member.exception.MemberExceptionMessage.INVALID_EMAIL_FROM;
+import static com.hh.mirishop.member.exception.MemberExceptionMessage.INVALID_PASSWORD_LENGTH;
 
-import com.hh.mirishop.user.domain.User;
-import com.hh.mirishop.user.dto.UserRequest;
-import com.hh.mirishop.user.repository.UserRepository;
+import com.hh.mirishop.member.domain.Member;
+import com.hh.mirishop.member.dto.MemberRequest;
+import com.hh.mirishop.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,22 +17,22 @@ import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class MemberService {
 
     // 기본 이미지 경로는 추후 업로드 방식이 변경되면 수정 필요
     private static final String DEFAULT_PROFILE_IMAGE_PATH = "/uploads/images/default.jpg";
 
     private final static Pattern EMAIL_REGEX = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
-    public Long register(final UserRequest userRequest) {
-        String email = userRequest.getEmail();
-        String password = userRequest.getPassword();
-        String profileImagePath = userRequest.getProfileImage();
+    public Long register(final MemberRequest memberRequest) {
+        String email = memberRequest.getEmail();
+        String password = memberRequest.getPassword();
+        String profileImagePath = memberRequest.getProfileImage();
 
         validateEmail(email);
         validatePassword(password);
@@ -40,20 +40,18 @@ public class UserService {
 
         String encodedPassword = encodePassword(password);
 
-        final User user = User.builder()
-                .name(userRequest.getName())
-                .email(userRequest.getEmail())
+        final Member user = Member.builder()
+                .name(memberRequest.getName())
+                .email(memberRequest.getEmail())
                 .password(encodedPassword)
-                .profileImage(userRequest.getProfileImage())
-                .bio(userRequest.getBio())
+                .profileImage(memberRequest.getProfileImage())
+                .bio(memberRequest.getBio())
                 .build();
 
-        final User userEntity = userRepository.save(user);
+        final Member userEntity = memberRepository.save(user);
 
         return userEntity.getId();
     }
-
-
 
     private void validateEmail(String email) {
         validatedEmailForm(email);
@@ -67,7 +65,7 @@ public class UserService {
     }
 
     private void validatedDuplicatedEmail(String email) {
-        userRepository.findByEmail(email)
+        memberRepository.findByEmail(email)
                 .ifPresent(existingUser -> {
                     throw new IllegalArgumentException(DUPLICATED_EMAIL.getMessage());
                 });

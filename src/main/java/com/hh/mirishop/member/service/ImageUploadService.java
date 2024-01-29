@@ -1,4 +1,4 @@
-package com.hh.mirishop.user.service;
+package com.hh.mirishop.member.service;
 
 import com.hh.mirishop.file.util.FileUtils;
 import lombok.extern.slf4j.Slf4j;

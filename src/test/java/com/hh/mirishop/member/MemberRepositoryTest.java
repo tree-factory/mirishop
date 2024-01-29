@@ -1,9 +1,9 @@
-package com.hh.mirishop.user;
+package com.hh.mirishop.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.hh.mirishop.user.domain.User;
-import com.hh.mirishop.user.repository.UserRepository;
+import com.hh.mirishop.member.domain.Member;
+import com.hh.mirishop.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @DisplayName("유저 DB 저장 테스트")
-class UserRepositoryTest {
+class MemberRepositoryTest {
 
     @Autowired
-    UserRepository userRepository;
+    MemberRepository userRepository;
 
-    private User createUser() {
-        return User.builder()
+    private Member createUser() {
+        return Member.builder()
                 .email("noyes5@naver.com")
                 .password("password")
                 .name("임상현")
@@ -31,9 +31,9 @@ class UserRepositoryTest {
     @DisplayName("정상 가입 테스트")
     @Transactional
     public void createUserTest() throws Exception {
-        User user = createUser();
+        Member user = createUser();
 
-        User findUser = userRepository.save(user);
+        Member findUser = userRepository.save(user);
 
         assertThat(findUser).isEqualTo(user);
     }

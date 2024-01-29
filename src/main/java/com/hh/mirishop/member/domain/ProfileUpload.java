@@ -1,10 +1,11 @@
-package com.hh.mirishop.user.domain;
+package com.hh.mirishop.member.domain;
+
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
-import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class ProfileUpload {

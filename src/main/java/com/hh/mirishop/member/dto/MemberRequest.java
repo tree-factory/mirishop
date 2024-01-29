@@ -1,4 +1,4 @@
-package com.hh.mirishop.user.dto;
+package com.hh.mirishop.member.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRequest {
+public class MemberRequest {
 
     @NotBlank
     private String email;
@@ -26,4 +26,5 @@ public class UserRequest {
 
     @NotBlank
     private String bio;
+
 }
