@@ -4,6 +4,8 @@ package com.hh.mirishop.member.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,8 +30,8 @@ public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "number")
+    private Long number;
 
     @Column(name = "email", nullable = false)
     private String email;
@@ -37,14 +39,18 @@ public class Member {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(name = "nickname", nullable = false)
+    private String nickname;
 
     @Column(name = "profile_image", nullable = false)
     private String profileImage;
 
     @Column(name = "bio", nullable = false)
     private String bio;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role;
 
     @Column(name = "created_at")
     @CreatedDate
@@ -54,4 +60,6 @@ public class Member {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
+    private boolean isDeleted = false; // false로 초기화
 }

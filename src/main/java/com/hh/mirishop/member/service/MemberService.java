@@ -6,6 +6,7 @@ import static com.hh.mirishop.member.exception.MemberExceptionMessage.INVALID_EM
 import static com.hh.mirishop.member.exception.MemberExceptionMessage.INVALID_PASSWORD_LENGTH;
 
 import com.hh.mirishop.member.domain.Member;
+import com.hh.mirishop.member.domain.Role;
 import com.hh.mirishop.member.dto.MemberRequest;
 import com.hh.mirishop.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,16 +42,18 @@ public class MemberService {
         String encodedPassword = encodePassword(password);
 
         final Member user = Member.builder()
-                .name(memberRequest.getName())
+                .nickname(memberRequest.getName())
                 .email(memberRequest.getEmail())
                 .password(encodedPassword)
                 .profileImage(memberRequest.getProfileImage())
                 .bio(memberRequest.getBio())
+                .role(Role.ROLE_USER) // role 설정
+                .isDeleted(false) // 기본값 false
                 .build();
 
         final Member userEntity = memberRepository.save(user);
 
-        return userEntity.getId();
+        return userEntity.getNumber();
     }
 
     private void validateEmail(String email) {
