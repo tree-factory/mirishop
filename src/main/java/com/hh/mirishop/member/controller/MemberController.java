@@ -3,6 +3,7 @@ package com.hh.mirishop.member.controller;
 
 import com.hh.mirishop.email.repository.EmailRequest;
 import com.hh.mirishop.email.service.EmailService;
+import com.hh.mirishop.member.dto.LoginRequest;
 import com.hh.mirishop.member.dto.MemberRequest;
 import com.hh.mirishop.member.service.ImageUploadService;
 import com.hh.mirishop.member.service.MemberService;
@@ -21,11 +22,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Map;
 
-@Slf4j
 @RestController
-@RequestMapping("/api/members")
+@RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;

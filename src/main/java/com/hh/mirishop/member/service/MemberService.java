@@ -1,13 +1,16 @@
 package com.hh.mirishop.member.service;
 
 import static com.hh.mirishop.common.Constants.USER_PASSWORD_LENGTH;
-import static com.hh.mirishop.member.exception.MemberExceptionMessage.DUPLICATED_EMAIL;
-import static com.hh.mirishop.member.exception.MemberExceptionMessage.INVALID_EMAIL_FROM;
-import static com.hh.mirishop.member.exception.MemberExceptionMessage.INVALID_PASSWORD_LENGTH;
+import static com.hh.mirishop.member.exception.ErrorCode.DUPLICATED_EMAIL;
+import static com.hh.mirishop.member.exception.ErrorCode.INVALID_EMAIL_FROM;
+import static com.hh.mirishop.member.exception.ErrorCode.INVALID_PASSWORD_LENGTH;
 
+import com.hh.mirishop.auth.infrastructure.JwtTokenProvider;
 import com.hh.mirishop.member.domain.Member;
 import com.hh.mirishop.member.domain.Role;
 import com.hh.mirishop.member.dto.MemberRequest;
+import com.hh.mirishop.member.exception.ErrorCode;
+import com.hh.mirishop.member.exception.MemberException;
 import com.hh.mirishop.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,6 +31,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public Long register(final MemberRequest memberRequest) {
@@ -88,5 +93,17 @@ public class MemberService {
         if (profileImagePath == null || profileImagePath.isEmpty()) {
             profileImagePath = DEFAULT_PROFILE_IMAGE_PATH;
         }
+    }
+
+    public String login(String email, String password) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND,
+                        String.format("%s는 가입 이력이 없습니다.", email)));
+
+        if (!bCryptPasswordEncoder.matches(password, member.getPassword())) {
+            throw new MemberException(ErrorCode.INVALID_PASSWORD, String.format("이메일 또는 패스워드가 잘못 되었습니다."));
+        }
+
+        return jwtTokenProvider.createToken(email);
     }
 }
