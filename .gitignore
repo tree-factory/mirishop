@@ -38,3 +38,5 @@ out/
 
 ### Docker ###
 /docker/data/
+
+src/main/resources/application-local.yml
