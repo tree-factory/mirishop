@@ -1,4 +1,4 @@
-package com.hh.mirishop.member.exception;
+package com.hh.mirishop.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

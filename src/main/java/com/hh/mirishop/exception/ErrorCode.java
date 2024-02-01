@@ -1,4 +1,4 @@
-package com.hh.mirishop.member.exception;
+package com.hh.mirishop.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +14,6 @@ public enum ErrorCode {
     INVALID_PASSWORD_LENGTH(HttpStatus.BAD_REQUEST, "비밀번호는 8자리 이상 입력해주세요."),
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "회원이 존재하지 않습니다.");
 
-
-    private HttpStatus httpStatus;
+    private final HttpStatus httpStatus;
     private final String message;
 }
