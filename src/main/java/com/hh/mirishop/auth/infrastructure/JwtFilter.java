@@ -34,19 +34,19 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         try {
             // 1. Request Header 에서 토큰을 꺼냄
-            String jwt = resolveToken(request);
+            String token = resolveToken(request);
 
             // 2. validateToken 으로 토큰 유효성 검사
             // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
-            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
-                Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
+            if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(jwtTokenProvider.extractEmail(jwt));
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(jwtTokenProvider.extractEmailFromToken(token));
             AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userDetails,
-                    jwt,
+                    token,
                     userDetails.getAuthorities()
             );
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

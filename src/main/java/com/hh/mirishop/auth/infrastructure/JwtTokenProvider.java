@@ -82,7 +82,7 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractEmail(String token) {
+    public String extractEmailFromToken(String token) {
         try {
             if (!validateToken(token)) {
                 throw new RuntimeException("토큰값이 유효하지 않습니다.");

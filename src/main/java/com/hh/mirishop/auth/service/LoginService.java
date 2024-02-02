@@ -34,12 +34,15 @@ public class LoginService {
                         String.format("%s는 가입 이력이 없습니다.", email)));
 
         validatePassword(password, member);
-
-        TokenResponse tokenResponse = jwtTokenProvider.generateTokenResponse(email);
-
-        redisService.setDataExpire(email, tokenResponse.getRefreshToken(), 3 * 24 * 60 * 60L); ;
+        TokenResponse tokenResponse = getNewTokenResponse(email);
 
         return tokenResponse;
+    }
+
+    private TokenResponse getNewTokenResponse(String email) {
+        TokenResponse newTokenResponse = jwtTokenProvider.generateTokenResponse(email);
+        redisService.setDataExpire(email, newTokenResponse.getRefreshToken(), 3 * 24 * 60 * 60L);
+        return newTokenResponse;
     }
 
     private void validatePassword(String password, Member member) {
@@ -48,20 +51,24 @@ public class LoginService {
         }
     }
 
-//    @Transactional
-//    public TokenResponseDto reissue(final TokenRequestDto tokenRequestDto) {
-//        validateRefreshToken(tokenRequestDto);
-//
-//        Authentication authentication = tokenProvider.getAuthentication(tokenRequestDto.getAccessToken());
-//        RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
-//                .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자입니다."));
-//
-//        validateRefreshTokenOwner(refreshToken, tokenRequestDto);
-//
-//        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-//        RefreshToken newRefreshToken = refreshToken.updateValue(tokenDto.getRefreshToken());
-//        refreshTokenRepository.save(newRefreshToken);
-//
-//        return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
-//    }
+    @Transactional
+    public TokenResponse reissue(final String refreshToken) {
+        // 리프레시 토큰 유효성 검증
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new MemberException(ErrorCode.INVALID_REFRESH_TOKEN, "유효하지 않은 리프레시 토큰입니다.");
+        }
+
+        // 리프레시 토큰으로부터 사용자 정보 추출
+        String email = jwtTokenProvider.extractEmailFromToken(refreshToken);
+
+        // Redis에 저장된 리프레시 토큰과 비교
+        String storedRefreshToken = redisService.getData(email);
+        if (!refreshToken.equals(storedRefreshToken)) {
+            throw new MemberException(ErrorCode.INVALID_REFRESH_TOKEN, "리프레시 토큰이 불일치 합니다.");
+        }
+
+        TokenResponse newTokenResponse = getNewTokenResponse(email);
+
+        return newTokenResponse;
+    }
 }
