@@ -7,12 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -31,7 +29,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws IOException, ServletException {
         try {
             // 1. Request Header 에서 토큰을 꺼냄
             String token = resolveToken(request);
@@ -39,19 +38,15 @@ public class JwtFilter extends OncePerRequestFilter {
             // 2. validateToken 으로 토큰 유효성 검사
             // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
             if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                UserDetails userDetails = customUserDetailsService.loadUserByUsername(
+                        jwtTokenProvider.extractEmailFromToken(token));
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        token,
+                        userDetails.getAuthorities()
+                );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(jwtTokenProvider.extractEmailFromToken(token));
-            AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    token,
-                    userDetails.getAuthorities()
-            );
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);  // security 인식하도록 설정 <--
-
         } catch (Exception e) {
             log.error(e.getMessage());
         } finally {
