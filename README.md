@@ -11,4 +11,5 @@ $ docker-compose up -d
 ~~~
 
 ### ERD 테이블
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/5954dcc0-b016-4c39-9969-fa61d0a845cb/962b3a21-3882-44f3-a268-10a7d9faa415/Untitled.png)
+![image](https://github.com/noyes5/mirishop/assets/116651434/4e45049b-ee04-4a23-b138-42d4c06c5b53)
+
