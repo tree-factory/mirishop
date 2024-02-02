@@ -9,7 +9,6 @@ import com.hh.mirishop.member.domain.Member;
 import com.hh.mirishop.member.repository.MemberRepository;
 import com.hh.mirishop.redis.service.RedisService;
 import lombok.AllArgsConstructor;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class LoginService {
 
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
@@ -71,4 +69,6 @@ public class LoginService {
 
         return newTokenResponse;
     }
+
+
 }

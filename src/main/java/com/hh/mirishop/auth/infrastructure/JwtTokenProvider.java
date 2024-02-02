@@ -10,24 +10,13 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-
-    private static final String AUTHORITIES_KEY = "auth";
-    private static final String BEARER_TYPE = "bearer";
 
     @Value("${security.jwt.secret-key}")
     private String secretKey;
@@ -47,7 +36,6 @@ public class JwtTokenProvider {
         String refreshToken = createRefreshToken(memberEmail, refreshTokenValidity);
 
         return TokenResponse.builder()
-                .grantType(BEARER_TYPE)
                 .accessToken(accessToken)
                 .expiresIn(accessTokenValidity.getTime())
                 .refreshToken(refreshToken)
@@ -97,25 +85,6 @@ public class JwtTokenProvider {
         }
     }
 
-    public Authentication getAuthentication(String accessToken) {
-        Claims claims = parseClaims(accessToken);
-
-        if (claims.get(AUTHORITIES_KEY) == null) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
-        }
-
-        // 클레임에서 권한 정보 가져오기
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .toList();
-
-        // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
-    }
-
     public boolean validateToken(String token) {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
@@ -125,7 +94,7 @@ public class JwtTokenProvider {
         }
     }
 
-    private Claims parseClaims(String accessToken) {
+    public Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(accessToken).getBody();
         } catch (ExpiredJwtException e) {
