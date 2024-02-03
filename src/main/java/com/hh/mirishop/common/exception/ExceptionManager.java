@@ -1,4 +1,4 @@
-package com.hh.mirishop.exception;
+package com.hh.mirishop.common.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

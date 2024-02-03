@@ -1,6 +1,6 @@
 package com.hh.mirishop.auth.domain;
 
-import com.hh.mirishop.member.domain.Member;
+import com.hh.mirishop.member.entity.Member;
 import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

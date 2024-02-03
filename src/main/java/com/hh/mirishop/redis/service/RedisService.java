@@ -1,6 +1,6 @@
 package com.hh.mirishop.redis.service;
 
-import com.hh.mirishop.exception.TokenExpiredException;
+import com.hh.mirishop.common.exception.TokenExpiredException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;

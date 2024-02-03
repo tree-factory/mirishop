@@ -2,7 +2,7 @@ package com.hh.mirishop.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.hh.mirishop.member.domain.Member;
+import com.hh.mirishop.member.entity.Member;
 import com.hh.mirishop.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

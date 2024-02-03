@@ -1,4 +1,4 @@
-package com.hh.mirishop.email.config;
+package com.hh.mirishop.config;
 
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Value;

@@ -3,7 +3,6 @@ package com.hh.mirishop.member.controller;
 
 import com.hh.mirishop.email.repository.EmailRequest;
 import com.hh.mirishop.email.service.EmailService;
-import com.hh.mirishop.member.dto.LoginRequest;
 import com.hh.mirishop.member.dto.MemberRequest;
 import com.hh.mirishop.member.service.ImageUploadService;
 import com.hh.mirishop.member.service.MemberService;
@@ -22,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -43,7 +41,7 @@ public class MemberController {
     }
 
     /*
-   이메일 인증요청
+    이메일 인증요청
     */
     @PostMapping("/email-authentication")
     public ResponseEntity<Void> requestEmailVerification(@RequestBody @Valid EmailRequest request) {

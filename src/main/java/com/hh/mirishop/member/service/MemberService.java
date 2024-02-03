@@ -1,11 +1,11 @@
 package com.hh.mirishop.member.service;
 
-import static com.hh.mirishop.common.Constants.USER_PASSWORD_LENGTH;
-import static com.hh.mirishop.exception.ErrorCode.DUPLICATED_EMAIL;
-import static com.hh.mirishop.exception.ErrorCode.INVALID_EMAIL_FROM;
-import static com.hh.mirishop.exception.ErrorCode.INVALID_PASSWORD_LENGTH;
+import static com.hh.mirishop.common.constants.Constants.USER_PASSWORD_LENGTH;
+import static com.hh.mirishop.common.exception.ErrorCode.DUPLICATED_EMAIL;
+import static com.hh.mirishop.common.exception.ErrorCode.INVALID_EMAIL_FROM;
+import static com.hh.mirishop.common.exception.ErrorCode.INVALID_PASSWORD_LENGTH;
 
-import com.hh.mirishop.member.domain.Member;
+import com.hh.mirishop.member.entity.Member;
 import com.hh.mirishop.member.domain.Role;
 import com.hh.mirishop.member.dto.MemberRequest;
 import com.hh.mirishop.member.repository.MemberRepository;

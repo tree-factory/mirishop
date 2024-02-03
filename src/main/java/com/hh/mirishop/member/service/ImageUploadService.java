@@ -1,6 +1,6 @@
 package com.hh.mirishop.member.service;
 
-import com.hh.mirishop.file.util.FileUtils;
+import com.hh.mirishop.common.util.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

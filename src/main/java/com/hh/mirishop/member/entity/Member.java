@@ -1,5 +1,6 @@
-package com.hh.mirishop.member.domain;
+package com.hh.mirishop.member.entity;
 
+import com.hh.mirishop.member.domain.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
