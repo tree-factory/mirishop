@@ -1,6 +1,8 @@
 package com.hh.mirishop.auth.infrastructure;
 
 import com.hh.mirishop.auth.dto.TokenResponse;
+import com.hh.mirishop.common.exception.ErrorCode;
+import com.hh.mirishop.common.exception.JwtTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -73,7 +75,7 @@ public class JwtTokenProvider {
     public String extractEmailFromToken(String token) {
         try {
             if (!validateToken(token)) {
-                throw new RuntimeException("토큰값이 유효하지 않습니다.");
+                throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
             }
             return Jwts.parser()
                     .setSigningKey(secretKey)
@@ -81,7 +83,7 @@ public class JwtTokenProvider {
                     .getBody()
                     .get("memberEmail", String.class);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("토큰값이 유효하지 않습니다.");
+            throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
         }
     }
 
@@ -90,7 +92,7 @@ public class JwtTokenProvider {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException exception) {
-            throw new RuntimeException("토큰값이 유효하지 않습니다.");
+            throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
         }
     }
 

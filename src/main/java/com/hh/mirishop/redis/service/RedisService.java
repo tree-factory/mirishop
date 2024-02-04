@@ -1,6 +1,7 @@
 package com.hh.mirishop.redis.service;
 
-import com.hh.mirishop.common.exception.TokenExpiredException;
+import com.hh.mirishop.common.exception.ErrorCode;
+import com.hh.mirishop.common.exception.JwtTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -37,7 +38,7 @@ public class RedisService {
     public void checkRefreshToken(String email, String refreshToken) {
         String redisRT = this.getData(email);
         if (!refreshToken.equals(redisRT)) {
-            throw new TokenExpiredException();
+            throw new JwtTokenException(ErrorCode.EXPIRED_TOKEN);
         }
     }
 }

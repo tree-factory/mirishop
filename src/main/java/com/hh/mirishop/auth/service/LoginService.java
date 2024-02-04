@@ -28,8 +28,7 @@ public class LoginService {
         String password = loginRequest.getPassword();
 
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND,
-                        String.format("%s는 가입 이력이 없습니다.", email)));
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
         validatePassword(password, member);
         TokenResponse tokenResponse = getNewTokenResponse(email);
@@ -45,7 +44,7 @@ public class LoginService {
 
     private void validatePassword(String password, Member member) {
         if (!bCryptPasswordEncoder.matches(password, member.getPassword())) {
-            throw new MemberException(ErrorCode.INVALID_PASSWORD, String.format("이메일 또는 패스워드가 잘못 되었습니다."));
+            throw new MemberException(ErrorCode.INVALID_PASSWORD);
         }
     }
 
@@ -53,7 +52,7 @@ public class LoginService {
     public TokenResponse reissue(final String refreshToken) {
         // 리프레시 토큰 유효성 검증
         if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw new MemberException(ErrorCode.INVALID_REFRESH_TOKEN, "유효하지 않은 리프레시 토큰입니다.");
+            throw new MemberException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         // 리프레시 토큰으로부터 사용자 정보 추출
@@ -62,7 +61,7 @@ public class LoginService {
         // Redis에 저장된 리프레시 토큰과 비교
         String storedRefreshToken = redisService.getData(email);
         if (!refreshToken.equals(storedRefreshToken)) {
-            throw new MemberException(ErrorCode.INVALID_REFRESH_TOKEN, "리프레시 토큰이 불일치 합니다.");
+            throw new MemberException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         TokenResponse newTokenResponse = getNewTokenResponse(email);
