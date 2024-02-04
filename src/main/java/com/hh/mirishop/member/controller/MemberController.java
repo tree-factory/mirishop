@@ -1,9 +1,13 @@
 package com.hh.mirishop.member.controller;
 
 
+import com.hh.mirishop.auth.domain.UserDetailsImpl;
+import com.hh.mirishop.common.dto.BaseResponse;
 import com.hh.mirishop.email.repository.EmailRequest;
 import com.hh.mirishop.email.service.EmailService;
+import com.hh.mirishop.member.dto.ChangePasswordRequest;
 import com.hh.mirishop.member.dto.MemberRequest;
+import com.hh.mirishop.member.dto.MemberUpdateRequest;
 import com.hh.mirishop.member.service.ImageUploadService;
 import com.hh.mirishop.member.service.MemberService;
 import jakarta.validation.Valid;
@@ -11,8 +15,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +39,9 @@ public class MemberController {
     private final EmailService emailService;
     private final ImageUploadService imageUploadService;
 
+    /*
+    회원가입
+     */
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody @Valid final MemberRequest memberRequest) {
         final Long userId = memberService.register(memberRequest);
@@ -77,5 +87,27 @@ public class MemberController {
             log.error("이미지 업로드 실패", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 업로드에 실패했습니다.");
         }
+    }
+
+    /*
+    유저 정보 수정
+    */
+    @PatchMapping("/{id}")
+    public ResponseEntity<BaseResponse<Void>> update(
+            @Valid @RequestBody MemberUpdateRequest memberUpdateRequest, @AuthenticationPrincipal
+    UserDetailsImpl userDetails) {
+        memberService.update(memberUpdateRequest, userDetails);
+        return ResponseEntity.ok().body(BaseResponse.of("유저 정보 변경 완료", true, null));
+    }
+
+    /*
+    비밀번호 정보 수정
+    */
+    @PutMapping("/{id}/password")
+    public ResponseEntity<BaseResponse<Void>> changePassword(
+            @Valid @RequestBody ChangePasswordRequest changePasswordRequest, @AuthenticationPrincipal
+    UserDetailsImpl userDetails) {
+        memberService.changePassword(changePasswordRequest, userDetails);
+        return ResponseEntity.ok().body(BaseResponse.of("패스워드 변경 완료", true, null));
     }
 }

@@ -1,20 +1,24 @@
 package com.hh.mirishop.member.service;
 
-import static com.hh.mirishop.common.constants.Constants.USER_PASSWORD_LENGTH;
+import static com.hh.mirishop.common.constants.UserConstants.EMAIL_REGEX;
+import static com.hh.mirishop.common.constants.UserConstants.USER_PASSWORD_LENGTH;
 import static com.hh.mirishop.common.exception.ErrorCode.DUPLICATED_EMAIL;
 import static com.hh.mirishop.common.exception.ErrorCode.INVALID_EMAIL_FROM;
 import static com.hh.mirishop.common.exception.ErrorCode.INVALID_PASSWORD_LENGTH;
 
-import com.hh.mirishop.member.entity.Member;
+import com.hh.mirishop.auth.domain.UserDetailsImpl;
 import com.hh.mirishop.member.domain.Role;
+import com.hh.mirishop.member.dto.ChangePasswordRequest;
 import com.hh.mirishop.member.dto.MemberRequest;
+import com.hh.mirishop.member.dto.MemberUpdateRequest;
+import com.hh.mirishop.member.entity.Member;
+import com.hh.mirishop.common.exception.user.SamePasswordException;
+import com.hh.mirishop.common.exception.user.WrongPasswordException;
 import com.hh.mirishop.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +26,6 @@ public class MemberService {
 
     // 기본 이미지 경로는 추후 업로드 방식이 변경되면 수정 필요
     private static final String DEFAULT_PROFILE_IMAGE_PATH = "/uploads/images/default.jpg";
-    private final static Pattern EMAIL_REGEX = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -81,9 +84,54 @@ public class MemberService {
         return bCryptPasswordEncoder.encode(password);
     }
 
-    private static void validateUploadProfileImage(String profileImagePath) {
+    private void validateUploadProfileImage(String profileImagePath) {
         if (profileImagePath == null || profileImagePath.isEmpty()) {
             profileImagePath = DEFAULT_PROFILE_IMAGE_PATH;
         }
+    }
+
+    @Transactional
+    public void update(MemberUpdateRequest memberUpdateRequest, UserDetailsImpl userDetails) {
+        Member member = memberRepository.findByEmail(userDetails.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException());// 수정 필요
+
+        String nickname = memberUpdateRequest.getNickName();
+        String profileImagePath = memberUpdateRequest.getProfileImage();
+        String bio = memberUpdateRequest.getBio();
+
+        validateUploadProfileImage(profileImagePath);
+
+        member.updateNickname(nickname);
+        member.updateProfileImage(profileImagePath);
+        member.updateBio(bio);
+
+        memberRepository.save(member);
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordRequest changePasswordRequest, UserDetailsImpl userDetails) {
+        Member member = memberRepository.findByEmail(userDetails.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException());// 수정 필요
+        String storedPassword = member.getPassword();
+        String oldPassword = changePasswordRequest.getOldPassword();
+        String newPassword = changePasswordRequest.getNewPassword();
+        validatePassword(newPassword);
+
+        // 기존 비밀번호 검증 로직
+        if (!isMatchesPassword(oldPassword, storedPassword)) {
+            throw new WrongPasswordException();
+        }
+
+        // 새로운 비밀번호가 기존 비밀번호와 같은 경우
+        if (isMatchesPassword(newPassword, storedPassword)) {
+            throw new SamePasswordException();
+        }
+
+        member.updatePassword(encodePassword(newPassword));
+        memberRepository.save(member);
+    }
+
+    private boolean isMatchesPassword(String password, String storedPassword) {
+        return bCryptPasswordEncoder.matches(password, storedPassword);
     }
 }
