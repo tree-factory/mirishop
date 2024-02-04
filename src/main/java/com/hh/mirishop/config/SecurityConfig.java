@@ -1,4 +1,4 @@
-package com.hh.mirishop.common.config;
+package com.hh.mirishop.config;
 
 import com.hh.mirishop.auth.infrastructure.JwtFilter;
 import com.hh.mirishop.auth.infrastructure.JwtTokenProvider;

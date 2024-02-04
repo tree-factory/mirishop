@@ -1,6 +1,8 @@
 package com.hh.mirishop.member.service;
 
-import com.hh.mirishop.file.util.FileUtils;
+import com.hh.mirishop.common.exception.EmailException;
+import com.hh.mirishop.common.exception.ErrorCode;
+import com.hh.mirishop.common.util.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,17 +30,17 @@ public class ImageUploadService {
             Files.createDirectories(imageDirectory);
         } catch (IOException e) {
             log.error("이미지 저장 폴더 생성 실패", e);
-            throw new RuntimeException("이미지 저장 폴더 생성 실패", e);
+            throw new EmailException(ErrorCode.DIRECTORY_CREATION_FAILURE);
         }
     }
 
     public String uploadImage(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
-            throw new IllegalStateException("업로드할 이미지가 없습니다.");
+            throw new EmailException(ErrorCode.EMPTY_FILE_EXCEPTION);
         }
 
         if (!isValidImageType(file)) {
-            throw new IllegalStateException("지원하지 않는 이미지 형식입니다.");
+            throw new EmailException(ErrorCode.UNSUPPORTED_IMAGE_FORMAT);
         }
 
         String filename = FileUtils.generateUniqueFileName(file.getOriginalFilename());
@@ -53,7 +55,7 @@ public class ImageUploadService {
         String contentType = file.getContentType();
         return contentType != null && (
                 contentType.contains("image/jpeg") ||
-                contentType.contains("image/png") ||
-                contentType.contains("image/gif"));
+                        contentType.contains("image/png") ||
+                        contentType.contains("image/gif"));
     }
 }

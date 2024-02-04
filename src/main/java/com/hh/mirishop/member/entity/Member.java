@@ -1,5 +1,6 @@
-package com.hh.mirishop.member.domain;
+package com.hh.mirishop.member.entity;
 
+import com.hh.mirishop.member.domain.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -61,4 +62,20 @@ public class Member {
 
     @Column(nullable = false)
     private boolean isDeleted = false; // false로 초기화
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public void updateBio(String bio) {
+        this.bio = bio;
+    }
+
+    public void updatePassword(String encodeNewPassword) {
+        this.password = encodeNewPassword;
+    }
 }

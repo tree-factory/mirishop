@@ -1,4 +1,4 @@
-package com.hh.mirishop.common.config;
+package com.hh.mirishop.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

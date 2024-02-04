@@ -1,4 +1,4 @@
-package com.hh.mirishop.file.util;
+package com.hh.mirishop.common.util;
 
 import java.util.UUID;
 

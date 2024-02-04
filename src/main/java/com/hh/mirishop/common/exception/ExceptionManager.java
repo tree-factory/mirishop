@@ -1,4 +1,4 @@
-package com.hh.mirishop.exception;
+package com.hh.mirishop.common.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +10,18 @@ public class ExceptionManager extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(MemberException.class)
     protected ResponseEntity<?> handleMemberException(MemberException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return handleExceptionInternal(errorCode);
+    }
+
+    @ExceptionHandler(JwtTokenException.class)
+    protected ResponseEntity<?> handleJwtTokenException(JwtTokenException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return handleExceptionInternal(errorCode);
+    }
+
+    @ExceptionHandler(EmailException.class)
+    protected ResponseEntity<?> handleEmailException(JwtTokenException e) {
         ErrorCode errorCode = e.getErrorCode();
         return handleExceptionInternal(errorCode);
     }

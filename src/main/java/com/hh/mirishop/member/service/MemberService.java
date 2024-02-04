@@ -1,20 +1,21 @@
 package com.hh.mirishop.member.service;
 
-import static com.hh.mirishop.common.Constants.USER_PASSWORD_LENGTH;
-import static com.hh.mirishop.exception.ErrorCode.DUPLICATED_EMAIL;
-import static com.hh.mirishop.exception.ErrorCode.INVALID_EMAIL_FROM;
-import static com.hh.mirishop.exception.ErrorCode.INVALID_PASSWORD_LENGTH;
+import static com.hh.mirishop.common.constants.UserConstants.EMAIL_REGEX;
+import static com.hh.mirishop.common.constants.UserConstants.USER_PASSWORD_LENGTH;
 
-import com.hh.mirishop.member.domain.Member;
+import com.hh.mirishop.auth.domain.UserDetailsImpl;
+import com.hh.mirishop.common.exception.ErrorCode;
+import com.hh.mirishop.common.exception.MemberException;
 import com.hh.mirishop.member.domain.Role;
+import com.hh.mirishop.member.dto.ChangePasswordRequest;
 import com.hh.mirishop.member.dto.MemberRequest;
+import com.hh.mirishop.member.dto.MemberUpdateRequest;
+import com.hh.mirishop.member.entity.Member;
 import com.hh.mirishop.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,6 @@ public class MemberService {
 
     // 기본 이미지 경로는 추후 업로드 방식이 변경되면 수정 필요
     private static final String DEFAULT_PROFILE_IMAGE_PATH = "/uploads/images/default.jpg";
-    private final static Pattern EMAIL_REGEX = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -53,27 +53,27 @@ public class MemberService {
         return userEntity.getNumber();
     }
 
-    private void validateEmail(String email) {
+    private void validateEmail(final String email) {
         validatedEmailForm(email);
         validatedDuplicatedEmail(email);
     }
 
-    private void validatedEmailForm(String email) {
+    private void validatedEmailForm(final String email) {
         if (!EMAIL_REGEX.matcher(email).matches()) {
-            throw new IllegalArgumentException(INVALID_EMAIL_FROM.getMessage());
+            throw new MemberException(ErrorCode.INVALID_EMAIL_FROM);
         }
     }
 
     private void validatedDuplicatedEmail(String email) {
         memberRepository.findByEmail(email)
                 .ifPresent(existingUser -> {
-                    throw new IllegalArgumentException(DUPLICATED_EMAIL.getMessage());
+                    throw new MemberException(ErrorCode.DUPLICATED_EMAIL);
                 });
     }
 
     private void validatePassword(String password) {
         if (password.length() < USER_PASSWORD_LENGTH) {
-            throw new IllegalArgumentException(INVALID_PASSWORD_LENGTH.getMessage());
+            throw new MemberException(ErrorCode.INVALID_PASSWORD_LENGTH);
         }
     }
 
@@ -81,9 +81,54 @@ public class MemberService {
         return bCryptPasswordEncoder.encode(password);
     }
 
-    private static void validateUploadProfileImage(String profileImagePath) {
+    private void validateUploadProfileImage(String profileImagePath) {
         if (profileImagePath == null || profileImagePath.isEmpty()) {
             profileImagePath = DEFAULT_PROFILE_IMAGE_PATH;
         }
+    }
+
+    @Transactional
+    public void update(MemberUpdateRequest memberUpdateRequest, UserDetailsImpl userDetails) {
+        Member member = memberRepository.findByEmail(userDetails.getEmail())
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+        String nickname = memberUpdateRequest.getNickName();
+        String profileImagePath = memberUpdateRequest.getProfileImage();
+        String bio = memberUpdateRequest.getBio();
+
+        validateUploadProfileImage(profileImagePath);
+
+        member.updateNickname(nickname);
+        member.updateProfileImage(profileImagePath);
+        member.updateBio(bio);
+
+        memberRepository.save(member);
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordRequest changePasswordRequest, UserDetailsImpl userDetails) {
+        Member member = memberRepository.findByEmail(userDetails.getEmail())
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+        String storedPassword = member.getPassword();
+        String oldPassword = changePasswordRequest.getOldPassword();
+        String newPassword = changePasswordRequest.getNewPassword();
+        validatePassword(newPassword);
+
+        // 기존 비밀번호 검증 로직
+        if (!isMatchesPassword(oldPassword, storedPassword)) {
+            throw new MemberException(ErrorCode.WRONG_PASSWORD);
+        }
+
+        // 새로운 비밀번호가 기존 비밀번호와 같은 경우
+        if (isMatchesPassword(newPassword, storedPassword)) {
+            throw new MemberException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        member.updatePassword(encodePassword(newPassword));
+        memberRepository.save(member);
+    }
+
+    private boolean isMatchesPassword(String password, String storedPassword) {
+        return bCryptPasswordEncoder.matches(password, storedPassword);
     }
 }
