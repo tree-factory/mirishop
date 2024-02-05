@@ -8,6 +8,11 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    // follow 에러 관련
+    CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST,"자기 자신은 팔로우 할 수 없습니다."),
+    FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "팔로우 유저를 찾을 수 없습니다."),
+    DUPLICATE_FOLLOW(HttpStatus.CONFLICT,"이미 팔로우한 유저는 팔로우 할 수 없습니다."),
+
     // email 에러 관련
     DIRECTORY_CREATION_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR,"이미지 저장 폴더 생성 실패"),
     DUPLICATED_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),

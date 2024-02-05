@@ -21,7 +21,13 @@ public class ExceptionManager extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(EmailException.class)
-    protected ResponseEntity<?> handleEmailException(JwtTokenException e) {
+    protected ResponseEntity<?> handleEmailException(EmailException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return handleExceptionInternal(errorCode);
+    }
+
+    @ExceptionHandler(FollowException.class)
+    protected ResponseEntity<?> handleFollowException(FollowException e) {
         ErrorCode errorCode = e.getErrorCode();
         return handleExceptionInternal(errorCode);
     }
