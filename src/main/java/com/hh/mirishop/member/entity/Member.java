@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "Members")
 @Getter
 @Builder
 @AllArgsConstructor
@@ -60,8 +62,8 @@ public class Member {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
-    private boolean isDeleted = false; // false로 초기화
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false; // 처음 생성시 false로 초기화
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;

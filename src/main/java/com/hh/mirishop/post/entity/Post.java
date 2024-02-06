@@ -4,6 +4,7 @@ import com.hh.mirishop.member.entity.Member;
 import com.hh.mirishop.post.dto.PostRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,13 +15,17 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "Posts")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Post")
+@EntityListeners(AuditingEntityListener.class)
 public class Post {
 
     @Id
@@ -35,9 +40,11 @@ public class Post {
     private String content;
 
     @Column(name = "created_at", nullable = false)
+    @CreatedDate
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,8 +58,6 @@ public class Post {
         this.title = postRequest.getTitle();
         this.content = postRequest.getContent();
         this.member = member;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     // 게시글 수정
@@ -62,9 +67,8 @@ public class Post {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // 게시글 삭제(soft)
+    // 게시글 삭제(soft delete방식)
     public void delete(boolean isDeleted) {
-        this.updatedAt = LocalDateTime.now();
         this.isDeleted = isDeleted;
     }
 }
