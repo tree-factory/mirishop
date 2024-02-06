@@ -33,7 +33,6 @@ public class PostService {
         Member currentMember = memberRepository.findById(currentMemberNumber)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
-
         Post post = new Post(postRequest.getTitle(), postRequest.getContent(), currentMember);
         postRepository.save(post);
 

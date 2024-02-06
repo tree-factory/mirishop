@@ -48,7 +48,7 @@ public class PostController {
     }
 
     /*
-    회원 본인이 작성한 게시글 보는 메소드
+    본인이 작성한 게시글 보는 메소드
     */
     @GetMapping
     public ResponseEntity<BaseResponse<Page<PostResponse>>> getAllPosts(@RequestParam("page") int page,
