@@ -1,7 +1,6 @@
 package com.hh.mirishop.post.entity;
 
 import com.hh.mirishop.member.entity.Member;
-import com.hh.mirishop.post.dto.PostRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -54,9 +53,9 @@ public class Post {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
-    public Post(PostRequest postRequest, Member member){
-        this.title = postRequest.getTitle();
-        this.content = postRequest.getContent();
+    public Post(String title, String content, Member member){
+        this.title = title;
+        this.content = content;
         this.member = member;
     }
 
