@@ -31,6 +31,10 @@ public enum ErrorCode {
     INVALID_PASSWORD_LENGTH(HttpStatus.BAD_REQUEST, "비밀번호는 8자리 이상 입력해주세요."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다."),
     WRONG_PASSWORD(HttpStatus.UNAUTHORIZED, "기존 비밀번호가 일치하지 않습니다."),
+
+    // post 에러 관련
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글이 존재하지 않습니다."),
+    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "게시글 수정/삭제는 회원 본인만 가능합니다."),
     ;
 
     private final HttpStatus httpStatus;
