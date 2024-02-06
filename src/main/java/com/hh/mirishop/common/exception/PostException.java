@@ -1,15 +1,14 @@
 package com.hh.mirishop.common.exception;
 
-
 import lombok.Getter;
 
 @Getter
-public class JwtTokenException extends RuntimeException {
+public class PostException extends RuntimeException {
 
     private final ErrorCode errorCode;
     private final String message;
 
-    public JwtTokenException(ErrorCode errorCode) {
+    public PostException(ErrorCode errorCode) {
         this.errorCode = errorCode;
         this.message = errorCode.getMessage();
     }

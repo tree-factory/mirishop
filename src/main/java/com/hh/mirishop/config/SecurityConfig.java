@@ -35,8 +35,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/members/email-verification").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/logout").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/activities").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/refreshToken").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/activities").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

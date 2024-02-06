@@ -1,16 +1,16 @@
 package com.hh.mirishop.common.exception;
 
-
 import lombok.Getter;
 
 @Getter
-public class JwtTokenException extends RuntimeException {
+public class LikeException extends RuntimeException {
 
     private final ErrorCode errorCode;
     private final String message;
 
-    public JwtTokenException(ErrorCode errorCode) {
+    public LikeException(ErrorCode errorCode) {
         this.errorCode = errorCode;
         this.message = errorCode.getMessage();
     }
 }
+

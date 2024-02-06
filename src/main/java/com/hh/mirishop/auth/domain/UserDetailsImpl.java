@@ -27,6 +27,10 @@ public class UserDetailsImpl implements UserDetails {
                 .build();
     }
 
+    public Long getNumber() {
+        return number;
+    }
+
     public String getEmail() {
         return email;
     }
