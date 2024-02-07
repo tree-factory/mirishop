@@ -44,6 +44,12 @@ public class ExceptionManager extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(errorCode);
     }
 
+    @ExceptionHandler(CommentException.class)
+    protected ResponseEntity<?> handleLCommentException(CommentException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return handleExceptionInternal(errorCode);
+    }
+
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(makeErrorResponse(errorCode));

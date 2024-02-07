@@ -74,7 +74,7 @@ public class PostService {
 
     private void checkAuthorizedMember(Long currentMemberNumber, Post post) {
         if (!post.getMember().getNumber().equals(currentMemberNumber)) {
-            throw new PostException(ErrorCode.UNAUTHORIZED_ACCESS);
+            throw new PostException(ErrorCode.UNAUTHORIZED_POST_ACCESS);
         }
     }
 }
