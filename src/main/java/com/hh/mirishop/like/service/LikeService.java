@@ -1,5 +1,8 @@
 package com.hh.mirishop.like.service;
 
+import com.hh.mirishop.comment.entity.Comment;
+import com.hh.mirishop.comment.repository.CommentRepository;
+import com.hh.mirishop.common.exception.CommentException;
 import com.hh.mirishop.common.exception.ErrorCode;
 import com.hh.mirishop.common.exception.LikeException;
 import com.hh.mirishop.common.exception.MemberException;
@@ -21,6 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LikeService {
 
+    private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
@@ -30,7 +34,7 @@ public class LikeService {
         Member currentMember = findMember(currentMemberNumber);
         Post post = findPost(postId);
 
-        if (isAlreadyLiked(postId, currentMember)) {
+        if (isAlreadyPostLiked(postId, currentMember)) {
             throw new LikeException(ErrorCode.ALREADY_LIKE);
         }
         likeRepository.save(new Like(currentMember, postId, LikeType.POST));
@@ -50,7 +54,7 @@ public class LikeService {
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
     }
 
-    private boolean isAlreadyLiked(Long postId, Member currentMember) {
+    private boolean isAlreadyPostLiked(Long postId, Member currentMember) {
         return likeRepository.existsByItemIdAndLikeTypeAndMember(postId, LikeType.POST, currentMember);
     }
 
@@ -65,4 +69,41 @@ public class LikeService {
         }
         likeRepository.delete(likeOpt.get());
     }
+
+    @Transactional
+    public void likeComment(Long commentId, Long currentMemberNumber) {
+        Member currentMember = findMember(currentMemberNumber);
+        Comment comment = findComment(commentId);
+
+        if (isAlreadyCommentLiked(commentId, currentMember)) {
+            throw new LikeException(ErrorCode.ALREADY_LIKE);
+        }
+        likeRepository.save(new Like(currentMember, commentId, LikeType.COMMENT));
+
+        /*
+        뉴스피드에 대한 로직 추가
+        */
+    }
+
+    private Comment findComment(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
+    }
+
+    private boolean isAlreadyCommentLiked(Long commentId, Member currentMember) {
+        return likeRepository.existsByItemIdAndLikeTypeAndMember(commentId, LikeType.COMMENT, currentMember);
+    }
+
+    @Transactional
+    public void unlikeComment(Long commentId, Long currentMemberNumber) {
+        Member currentMember = findMember(currentMemberNumber);
+        Comment comment = findComment(commentId);
+        Optional<Like> likeOpt = likeRepository.findByItemIdAndLikeTypeAndMember(commentId, LikeType.COMMENT, currentMember);
+
+        if (likeOpt.isEmpty()) {
+            throw new LikeException(ErrorCode.NOT_LIKE);
+        }
+        likeRepository.delete(likeOpt.get());
+    }
+
 }
