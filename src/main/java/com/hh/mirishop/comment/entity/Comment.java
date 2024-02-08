@@ -1,10 +1,8 @@
-package com.hh.mirishop.like.entity;
+package com.hh.mirishop.comment.entity;
 
-import com.hh.mirishop.like.domain.LikeType;
-import com.hh.mirishop.like.domain.LikeTypeConverter;
 import com.hh.mirishop.member.entity.Member;
+import com.hh.mirishop.post.entity.Post;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -15,6 +13,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -23,35 +23,43 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Likes")
+@Table(name = "Comments")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class Like {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "like_id")
-    private Long likeId;
+    @Column(name = "comment_id")
+    private Long commentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_number", referencedColumnName = "number")
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_number", nullable = false)
     private Member member;
 
-    @Column(name = "item_id")
-    private Long itemId; // 게시글 또는 댓글의 ID
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    private String content;
 
-    @Convert(converter = LikeTypeConverter.class)
-    @Column(name = "like_type")
-    private LikeType likeType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public Like(Member member, Long itemId, LikeType likeType) {
-        this.member = member;
-        this.itemId = itemId;
-        this.likeType = likeType;
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
+
+    // 게시글 삭제(soft delete방식)
+    public void delete(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

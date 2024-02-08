@@ -54,14 +54,25 @@ public class PostController {
     public ResponseEntity<BaseResponse<Page<PostResponse>>> getAllPosts(@RequestParam("page") int page,
                                                                         @RequestParam("size") int size,
                                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Page<PostResponse> postList = postService.getAllposts(page - 1, size, userDetails);
+        Page<PostResponse> postList = postService.getAllpostsByMember(page - 1, size, userDetails);
 
         return new ResponseEntity<>(BaseResponse.of("게시글 목록 조회 성공", true, postList), HttpStatus.OK);
     }
 
     /*
-    비회원이 게시글 모음을 볼지, 뉴스피드를 볼지 고민해야함.
+    게시글 한개 보기
     */
+    @GetMapping("/{postId}")
+    public ResponseEntity<BaseResponse<PostResponse>> getPost(@PathVariable Long postId){
+        PostResponse postResponse = postService.getPost(postId);
+        return ResponseEntity.ok(BaseResponse.of("게시글 내용 조회 성공", true, postResponse));
+    }
+
+    /*
+    Todo : 비회원이 게시글 모음을 볼지, 뉴스피드를 볼지 고민해야함.
+    */
+
+
 
     /*
     게시글 수정
