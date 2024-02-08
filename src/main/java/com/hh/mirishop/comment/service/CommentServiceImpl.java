@@ -1,6 +1,5 @@
 package com.hh.mirishop.comment.service;
 
-
 import com.hh.mirishop.comment.dto.CommentRequest;
 import com.hh.mirishop.comment.entity.Comment;
 import com.hh.mirishop.comment.repository.CommentRepository;
@@ -28,23 +27,26 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Long createComment(CommentRequest request, Long memberNumber, Long postId) {
+    public Long createCommentOrReply(CommentRequest request, Long memberNumber, Long postId) {
         Post post = findPostById(postId);
-        Member member = memberRepository.findById(memberNumber)
-                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+        Member member = findMemberByNumber(memberNumber);
+        Comment parentComment = null;
         Long parentCommentId = request.getParentCommentId();
-        if (parentCommentId != null) {
-            Comment parentComment = commentRepository.findById(parentCommentId)
-                    .orElseThrow(() -> new CommentException(ErrorCode.PARENT_COMMENT_NOT_FOUND));
 
+        // 부모 댓글이 없으면 null로 포함시키고, 있다면 depth 1만 허용
+        if (parentCommentId != null) {
+            parentComment = findParentCommentById(parentCommentId);
+            // 부모 댓글이 상위 부모를 가지는 경우 에러 처리
             if (parentComment.getParentComment() != null) {
                 throw new CommentException(ErrorCode.SUBCOMMENT_NOT_ALLOWED);
             }
         }
+
         Comment comment = Comment.builder()
                 .post(post)
                 .content(request.getContent())
                 .member(member)
+                .parentComment(parentComment)
                 .isDeleted(false)
                 .build();
 
@@ -56,25 +58,38 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Post findPostById(Long postId) {
-        return postRepository.findById(postId)
-                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
-    }
-
-    public List<Comment> getCommentsByPostId(Long postId) {
-        return commentRepository.findByPostId(postId);
-    }
-
-    @Override
     @Transactional
     public void deleteComment(Long commentId, Long currentMemberNumber) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
+        Comment comment = findCommentById(commentId);
 
         checkAuthorizedMember(currentMemberNumber, comment);
 
         comment.delete(true);
         commentRepository.save(comment);
+    }
+
+    private Post findPostById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
+    }
+
+    private Comment findParentCommentById(Long parentCommentId) {
+        return commentRepository.findById(parentCommentId)
+                .orElseThrow(() -> new CommentException(ErrorCode.PARENT_COMMENT_NOT_FOUND));
+    }
+
+    private Comment findCommentById(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
+    }
+
+    private Member findMemberByNumber(Long memberNumber) {
+        return memberRepository.findById(memberNumber)
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    public List<Comment> getCommentsByPostId(Long postId) {
+        return commentRepository.findByPostId(postId);
     }
 
     private void checkAuthorizedMember(Long currentMemberNumber, Comment comment) {

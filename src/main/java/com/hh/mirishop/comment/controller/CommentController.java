@@ -25,11 +25,14 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    /*
+    댓글 작성
+    */
     @PostMapping
     public ResponseEntity<BaseResponse<Void>> createComment(@Valid @RequestBody CommentRequest commentRequest,
                                                             @PathVariable("postId") Long postId,
                                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        Long commentId = commentService.createComment(commentRequest, userDetails.getNumber(), postId);
+        Long commentId = commentService.createCommentOrReply(commentRequest, userDetails.getNumber(), postId);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{commentId}")
@@ -39,10 +42,30 @@ public class CommentController {
         return ResponseEntity.created(location).body(BaseResponse.of("댓글이 생성되었습니다.", true, null));
     }
 
+    /*
+    댓글 삭제(대댓글도 가능)
+    */
     @DeleteMapping("/{commentId}")
     public ResponseEntity<BaseResponse<Void>> deleteComment(@PathVariable("commentId") Long commentId,
                                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         commentService.deleteComment(commentId, userDetails.getNumber());
         return ResponseEntity.ok(BaseResponse.of("댓글이 삭제되었습니다.", true, null));
+    }
+
+    /*
+    대댓글 작성
+    */
+    @PostMapping("/reply")
+    public ResponseEntity<BaseResponse<Void>> createReply(@Valid @RequestBody CommentRequest commentRequest,
+                                                          @PathVariable("postId") Long postId,
+                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long commentId = commentService.createCommentOrReply(commentRequest, userDetails.getNumber(), postId);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{commentId}")
+                .buildAndExpand(commentId)
+                .toUri();
+
+        return ResponseEntity.created(location).body(BaseResponse.of("대댓글이 생성되었습니다.", true, null));
     }
 }

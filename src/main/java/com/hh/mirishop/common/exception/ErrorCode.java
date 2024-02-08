@@ -44,7 +44,7 @@ public enum ErrorCode {
     // COMMENT 에러 관련
     COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "댓글이 존재하지 않습니다."),
     PARENT_COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "상위 댓글이 없습니다."),
-    SUBCOMMENT_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "대댓글에 대한 추가 댓글은 불가능합니다."),
+    SUBCOMMENT_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "대댓글을 달 수 없습니다."),
     UNAUTHORIZED_COMMENT_ACCESS(HttpStatus.UNAUTHORIZED, "댓글 삭제는 회원 본인만 가능합니다."),
     ;
 
