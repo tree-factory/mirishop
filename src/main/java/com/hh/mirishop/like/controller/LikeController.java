@@ -2,7 +2,7 @@ package com.hh.mirishop.like.controller;
 
 import com.hh.mirishop.auth.domain.UserDetailsImpl;
 import com.hh.mirishop.common.dto.BaseResponse;
-import com.hh.mirishop.like.service.LikeService;
+import com.hh.mirishop.like.service.LikeServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/likes")
 public class LikeController {
 
-    private final LikeService likeService;
+    private final LikeServiceImpl likeService;
 
     @PostMapping("/posts/{postId}")
     public ResponseEntity<BaseResponse<Void>> likePost(@PathVariable("postId") Long postId,

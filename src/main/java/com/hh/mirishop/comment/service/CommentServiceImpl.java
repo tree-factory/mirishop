@@ -7,6 +7,8 @@ import com.hh.mirishop.common.exception.CommentException;
 import com.hh.mirishop.common.exception.ErrorCode;
 import com.hh.mirishop.common.exception.MemberException;
 import com.hh.mirishop.common.exception.PostException;
+import com.hh.mirishop.like.domain.LikeType;
+import com.hh.mirishop.like.repository.LikeRepository;
 import com.hh.mirishop.member.entity.Member;
 import com.hh.mirishop.member.repository.MemberRepository;
 import com.hh.mirishop.post.entity.Post;
@@ -24,6 +26,7 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
+    private final LikeRepository likeRepository;
 
     @Override
     @Transactional
@@ -66,6 +69,11 @@ public class CommentServiceImpl implements CommentService {
 
         comment.delete(true);
         commentRepository.save(comment);
+    }
+
+    @Transactional
+    public Integer countLikeForComment(Long commentId) {
+        return likeRepository.countByItemIdAndLikeType(commentId, LikeType.COMMENT);
     }
 
     private Post findPostById(Long postId) {

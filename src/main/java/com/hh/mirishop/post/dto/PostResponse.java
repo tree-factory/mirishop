@@ -19,12 +19,12 @@ public class PostResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public PostResponse(Post post) {
+    public PostResponse(Post post, int likesCount) {
         this.postId = post.getPostId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.nickName = post.getMember().getNickname();
-        this.likesCount = 0;
+        this.likesCount = likesCount;
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
     }
