@@ -14,6 +14,36 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
 
+  redis:
+    container_name: redis_server
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: on-failure
+    volumes:
+      - ./redis/data:/data
+
+  redis_auth:
+    container_name: redis_auth_server
+    image: redis:latest
+    ports:
+      - "6380:6379"
+    restart: on-failure
+    volumes:
+      - ./redis_auth/data:/data
+
+  mongodb:
+    container_name: mongodb_server
+    image: mongo:latest
+    env_file: .env
+    ports:
+      - "27017:27017"
+    restart: on-failure
+    volumes:
+      - ./mongodb/data/db:/data/db
+      - ./mongodb/configdb:/data/configdb
+    command: mongod --auth
+
 #  spring-boot-app:
 #    build: ./
 #    ports:

@@ -14,23 +14,47 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @RequiredArgsConstructor
 @EnableRedisRepositories
 public class RedisConfig {
+
+    @Value("${spring.redis.cache.host}")
+    private String cacheHost;
+
+    @Value("${spring.redis.cache.port}")
+    private int cachePort;
+
     @Value("${spring.redis.auth.host}")
-    private String host;
+    private String authHost;
 
     @Value("${spring.redis.auth.port}")
-    private int port;
+    private int authPort;
 
     @Bean
-    public RedisConnectionFactory redisConnectionFactory(){
-        return new LettuceConnectionFactory(host, port);
+    public RedisConnectionFactory authConnectionFactory() {
+        return new LettuceConnectionFactory(authHost, authPort);
     }
 
-    @Bean
-    public RedisTemplate<String, String> redisTemplate() {
+    @Bean(name = "redisTemplate")
+    public RedisTemplate<String, String> authRedisTemplate() {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setConnectionFactory(authConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
+
         return redisTemplate;
     }
+
+    @Bean
+    public RedisConnectionFactory cacheRedisConnectionFactory() {
+        return new LettuceConnectionFactory(cacheHost, cachePort);
+    }
+
+    @Bean(name = "cacheRedisTemplate")
+    public RedisTemplate<String, String> cacheRedisTemplate() {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(cacheRedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+
+        return redisTemplate;
+    }
+
 }
