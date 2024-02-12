@@ -26,15 +26,14 @@ public class PostEventListener {
     */
     @PostPersist
     public void onPostCreate(Post post) {
-        Activity activity =  Activity.builder()
+        Activity activity = Activity.builder()
                 .memberNumber(post.getMember().getNumber())
                 .activityType(ActivityType.POST)
                 .activityId(post.getPostId())
-                .authorId(post.getMember().getNumber())
-                .title(post.getTitle())
-                .content(post.getContent())
+                .targetPostId(post.getPostId())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .isDeleted(false)
                 .build();
 
         mongoTemplate.save(activity, "activities");
@@ -45,8 +44,6 @@ public class PostEventListener {
         Query query = new Query(Criteria.where("activityId").is(post.getPostId())
                 .and("activityType").is(ActivityType.POST));
         Update update = new Update();
-        update.set("title", post.getTitle());
-        update.set("content", post.getContent());
         update.set("updatedAt", LocalDateTime.now());
 
         mongoTemplate.updateFirst(query, update, "activities");
@@ -58,13 +55,10 @@ public class PostEventListener {
                 .memberNumber(post.getMember().getNumber())
                 .activityType(ActivityType.POST)
                 .activityId(post.getPostId())
-                .authorId(post.getMember().getNumber())
-                .content("Post was deleted.")
-                .createdAt(LocalDateTime.now())
+                .isDeleted(false)
                 .build();
 
         mongoTemplate.save(activity, "activity");
     }
-
 }
 

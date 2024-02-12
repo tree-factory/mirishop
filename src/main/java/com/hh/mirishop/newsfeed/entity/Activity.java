@@ -31,22 +31,17 @@ public class Activity {
     private ActivityType activityType; // 활동 유형: post/comment/like
 
     @Field("activityId")
-    private Long activityId; // 활동 고유 ID (예: 게시글 ID, 댓글 ID)
+    private Long activityId; // 활동 고유 ID (게시글 ID, 댓글 ID, 좋아요 ID)
 
-    @Field("authorId")
-    private Long authorId; // 활동 작성자 ID
-
-    @Field("title")
-    private String title;
-
-    @Field("content")
-    private String content; // 활동 내용
+    @Field("targetPostId")
+    private Long targetPostId;
 
     @Field("createdAt")
-    private LocalDateTime createdAt; // 생성 시간
+    private LocalDateTime createdAt;
 
     @Field("updatedAt")
-    private LocalDateTime updatedAt; // 수정 시간
+    private LocalDateTime updatedAt;
 
-    private Long targetPostId;
+    @Field("is_deleted")
+    private Boolean isDeleted;
 }
