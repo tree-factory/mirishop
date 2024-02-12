@@ -65,8 +65,6 @@ public class MemberController {
     @GetMapping("/email-verification")
     public ResponseEntity<String> verifyEmail(@RequestParam("email") String email,
                                               @RequestParam("verificationCode") String verificationCode) {
-        System.out.println(email);
-        System.out.println(verificationCode);
         boolean isVerified = emailService.verityEmail(email, verificationCode);
         if (isVerified) {
             return ResponseEntity.ok("이메일 인증 성공");

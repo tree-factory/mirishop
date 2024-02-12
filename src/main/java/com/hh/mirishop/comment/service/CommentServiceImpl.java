@@ -71,6 +71,13 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.save(comment);
     }
 
+    @Override
+    @Transactional
+    public Long findPostIdByCommentId(Long commentId) {
+        return commentRepository.findPostIdByCommentId(commentId)
+                .orElseThrow(() -> new CommentException(ErrorCode.POST_NOT_FOUND));
+    }
+
     @Transactional
     public Integer countLikeForComment(Long commentId) {
         return likeRepository.countByItemIdAndLikeType(commentId, LikeType.COMMENT);
