@@ -1,1 +1,5 @@
 rootProject.name = 'mirishop'
+
+include 'user_service'
+include 'newsfeed_service'
+include 'activity_service'
