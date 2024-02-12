@@ -13,6 +13,7 @@ import com.hh.mirishop.post.dto.PostResponse;
 import com.hh.mirishop.post.entity.Post;
 import com.hh.mirishop.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.SoftDelete;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -76,6 +77,7 @@ public class PostService {
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
     }
 
+    @SoftDelete
     @Transactional
     public void deletePost(Long postId, Long currentMemberNumber) {
         Post post = findPostById(postId);

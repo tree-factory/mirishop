@@ -15,7 +15,9 @@ public class ActivityResponse {
     private Long memberNumber;
     private ActivityType activityType;
     private Long activityId;
+    private Long targetPostId;
     private LocalDateTime createdAt;
+    private Boolean isDeleted;
 
     public static ActivityResponse fromActivity(Activity activity) {
         return new ActivityResponse(
@@ -23,7 +25,9 @@ public class ActivityResponse {
                 activity.getMemberNumber(),
                 activity.getActivityType(),
                 activity.getActivityId(),
-                activity.getCreatedAt()
+                activity.getTargetPostId(),
+                activity.getCreatedAt(),
+                activity.getIsDeleted()
         );
     }
 }

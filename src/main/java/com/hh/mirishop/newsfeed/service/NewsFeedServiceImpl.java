@@ -45,14 +45,17 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                 .map(follow -> follow.getFollowing().getNumber())
                 .toList();
 
-        // 팔로잉하는 사용자들의 활동을 조회
-        Query query = new Query(Criteria.where("memberNumber").in(followingMemberNumbers))
-                .with(pageable);
-        mongoTemplate.find(query, Activity.class, "activities");
-        List<Activity> activities = mongoTemplate.find(query, Activity.class, "activities");
+        // 팔로잉하는 사용자들의 활동 중 삭제되지 않은 것들만 조회
+        Query query = new Query();
+        query.addCriteria(new Criteria().andOperator(
+                        Criteria.where("memberNumber").in(followingMemberNumbers),
+                        Criteria.where("isDeleted").is(false)
+                ))
+                .skip(page * size).limit(size);
+
         long total = mongoTemplate.count(query, Activity.class, "activities");
 
-        System.out.println(total);
+        List<Activity> activities = mongoTemplate.find(query, Activity.class, "activities");
 
         List<ActivityResponse> activityResponses = activities.stream()
                 .map(ActivityResponse::fromActivity)

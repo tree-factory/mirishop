@@ -14,6 +14,7 @@ import com.hh.mirishop.member.repository.MemberRepository;
 import com.hh.mirishop.post.entity.Post;
 import com.hh.mirishop.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.SoftDelete;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +62,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @SoftDelete
     @Transactional
     public void deleteComment(Long commentId, Long currentMemberNumber) {
         Comment comment = findCommentById(commentId);

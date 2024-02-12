@@ -4,7 +4,6 @@ import com.hh.mirishop.newsfeed.domain.ActivityType;
 import com.hh.mirishop.newsfeed.entity.Activity;
 import com.hh.mirishop.post.entity.Post;
 import jakarta.persistence.PostPersist;
-import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -39,6 +38,9 @@ public class PostEventListener {
         mongoTemplate.save(activity, "activities");
     }
 
+    /*
+    글 수정 시 뉴스피드 반영
+    */
     @PostUpdate
     public void onPostUpdate(Post post) {
         Query query = new Query(Criteria.where("activityId").is(post.getPostId())
@@ -49,16 +51,9 @@ public class PostEventListener {
         mongoTemplate.updateFirst(query, update, "activities");
     }
 
-    @PostRemove
-    public void onPostRemove(Post post) {
-        Activity activity = Activity.builder()
-                .memberNumber(post.getMember().getNumber())
-                .activityType(ActivityType.POST)
-                .activityId(post.getPostId())
-                .isDeleted(false)
-                .build();
-
-        mongoTemplate.save(activity, "activity");
-    }
+    /*
+    포스트 삭제는 AOP를 이용하여
+    common.aspect.MongoDBSoftDeleteAspect에서 처리
+    */
 }
 
