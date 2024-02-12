@@ -1,6 +1,7 @@
 package com.hh.mirishop.post.entity;
 
 import com.hh.mirishop.member.entity.Member;
+import com.hh.mirishop.post.infrastructure.PostEventListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -24,7 +25,7 @@ import java.time.LocalDateTime;
 @Table(name = "Posts")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners({AuditingEntityListener.class, PostEventListener.class})
 public class Post {
 
     @Id
@@ -53,7 +54,7 @@ public class Post {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
-    public Post(String title, String content, Member member){
+    public Post(String title, String content, Member member) {
         this.title = title;
         this.content = content;
         this.member = member;

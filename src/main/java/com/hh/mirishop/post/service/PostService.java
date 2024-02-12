@@ -4,7 +4,6 @@ import com.hh.mirishop.auth.domain.UserDetailsImpl;
 import com.hh.mirishop.common.exception.ErrorCode;
 import com.hh.mirishop.common.exception.MemberException;
 import com.hh.mirishop.common.exception.PostException;
-import com.hh.mirishop.follow.repository.FollowRepository;
 import com.hh.mirishop.like.domain.LikeType;
 import com.hh.mirishop.like.repository.LikeRepository;
 import com.hh.mirishop.member.entity.Member;
@@ -14,13 +13,13 @@ import com.hh.mirishop.post.dto.PostResponse;
 import com.hh.mirishop.post.entity.Post;
 import com.hh.mirishop.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.SoftDelete;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +28,6 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
-    private final FollowRepository followRepository;
 
     @Transactional
     public Long createPost(PostRequest postRequest, Long currentMemberNumber) {
@@ -43,9 +41,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PostResponse> getAllpostsByMember(@RequestParam("page") int page,
-                                          @RequestParam("size") int size,
-                                          UserDetailsImpl userDetails) {
+    public Page<PostResponse> getAllpostsByMember(int page, int size, UserDetailsImpl userDetails) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Long currentMemberNumber = userDetails.getNumber(); // 현재 사용자 ID 추출
         Page<Post> posts = postRepository.findByMemberNumberAndIsDeletedFalse(currentMemberNumber, pageable);
@@ -81,6 +77,7 @@ public class PostService {
                 .orElseThrow(() -> new PostException(ErrorCode.POST_NOT_FOUND));
     }
 
+    @SoftDelete
     @Transactional
     public void deletePost(Long postId, Long currentMemberNumber) {
         Post post = findPostById(postId);

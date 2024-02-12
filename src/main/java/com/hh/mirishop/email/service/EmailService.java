@@ -1,15 +1,16 @@
 package com.hh.mirishop.email.service;
 
+import com.hh.mirishop.common.redis.service.CacheRedisService;
 import com.hh.mirishop.email.repository.EmailRequest;
-import com.hh.mirishop.redis.service.RedisService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Random;
 
 @Service
 @Transactional
@@ -17,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmailService {
 
     private final JavaMailSender javaMailSender;
-    private final RedisService redisService;
+    private final CacheRedisService cacheRedisService;
 
     @Transactional
     public void authEmail(EmailRequest request) {
@@ -44,11 +45,11 @@ public class EmailService {
         }
 
         // 유효 시간(5분)동안 {email, authKey} 저장
-        redisService.setDataExpire(authKey, email, 60 * 5L);
+        cacheRedisService.setDataExpire(authKey, email, 60 * 5L);
     }
 
     public boolean verityEmail(String email, String verificationCode) {
-        String storedEmail = redisService.getData(verificationCode);
+        String storedEmail = cacheRedisService.getData(verificationCode);
         return email.equals(storedEmail);
     }
 }

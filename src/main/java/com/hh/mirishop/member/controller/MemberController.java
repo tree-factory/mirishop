@@ -65,8 +65,6 @@ public class MemberController {
     @GetMapping("/email-verification")
     public ResponseEntity<String> verifyEmail(@RequestParam("email") String email,
                                               @RequestParam("verificationCode") String verificationCode) {
-        System.out.println(email);
-        System.out.println(verificationCode);
         boolean isVerified = emailService.verityEmail(email, verificationCode);
         if (isVerified) {
             return ResponseEntity.ok("이메일 인증 성공");
@@ -92,7 +90,7 @@ public class MemberController {
     /*
     유저 정보 수정
     */
-    @PatchMapping("/{id}")
+    @PatchMapping
     public ResponseEntity<BaseResponse<Void>> update(
             @Valid @RequestBody MemberUpdateRequest memberUpdateRequest, @AuthenticationPrincipal
     UserDetailsImpl userDetails) {
@@ -103,7 +101,7 @@ public class MemberController {
     /*
     비밀번호 정보 수정
     */
-    @PutMapping("/{id}/password")
+    @PutMapping("/password")
     public ResponseEntity<BaseResponse<Void>> changePassword(
             @Valid @RequestBody ChangePasswordRequest changePasswordRequest, @AuthenticationPrincipal
     UserDetailsImpl userDetails) {

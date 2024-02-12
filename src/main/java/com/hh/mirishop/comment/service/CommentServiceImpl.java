@@ -14,6 +14,7 @@ import com.hh.mirishop.member.repository.MemberRepository;
 import com.hh.mirishop.post.entity.Post;
 import com.hh.mirishop.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.SoftDelete;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +62,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @SoftDelete
     @Transactional
     public void deleteComment(Long commentId, Long currentMemberNumber) {
         Comment comment = findCommentById(commentId);
@@ -69,6 +71,19 @@ public class CommentServiceImpl implements CommentService {
 
         comment.delete(true);
         commentRepository.save(comment);
+    }
+
+    @Override
+    @Transactional
+    public Long findPostIdByCommentId(Long commentId) {
+        return commentRepository.findPostIdByCommentId(commentId)
+                .orElseThrow(() -> new CommentException(ErrorCode.POST_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional
+    public List<Long> findCommentIdsByMemberNumber(Long memberNumber) {
+        return commentRepository.findCommentIdsByMemberNumber(memberNumber);
     }
 
     @Transactional
@@ -94,10 +109,6 @@ public class CommentServiceImpl implements CommentService {
     private Member findMemberByNumber(Long memberNumber) {
         return memberRepository.findById(memberNumber)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
-    }
-
-    public List<Comment> getCommentsByPostId(Long postId) {
-        return commentRepository.findByPostId(postId);
     }
 
     private void checkAuthorizedMember(Long currentMemberNumber, Comment comment) {

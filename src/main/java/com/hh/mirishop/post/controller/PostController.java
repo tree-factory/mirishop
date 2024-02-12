@@ -72,8 +72,6 @@ public class PostController {
     Todo : 비회원이 게시글 모음을 볼지, 뉴스피드를 볼지 고민해야함.
     */
 
-
-
     /*
     게시글 수정
     */

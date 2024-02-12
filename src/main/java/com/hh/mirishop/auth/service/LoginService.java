@@ -7,7 +7,7 @@ import com.hh.mirishop.common.exception.ErrorCode;
 import com.hh.mirishop.common.exception.MemberException;
 import com.hh.mirishop.member.entity.Member;
 import com.hh.mirishop.member.repository.MemberRepository;
-import com.hh.mirishop.redis.service.RedisService;
+import com.hh.mirishop.common.redis.service.AuthRedisService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class LoginService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
-    private final RedisService redisService;
+    private final AuthRedisService authRedisService;
 
     @Transactional
     public TokenResponse login(final LoginRequest loginRequest) {
@@ -38,7 +38,7 @@ public class LoginService {
 
     private TokenResponse getNewTokenResponse(String email) {
         TokenResponse newTokenResponse = jwtTokenProvider.generateTokenResponse(email);
-        redisService.setDataExpire(email, newTokenResponse.getRefreshToken(), 3 * 24 * 60 * 60L);
+        authRedisService.setDataExpire(email, newTokenResponse.getRefreshToken(), 3 * 24 * 60 * 60L);
         return newTokenResponse;
     }
 
@@ -56,10 +56,10 @@ public class LoginService {
         }
 
         // 리프레시 토큰으로부터 사용자 정보 추출
-        String email = jwtTokenProvider.extractEmailFromToken(refreshToken);
+        String email = jwtTokenProvider.extractEmailFromRefreshToken(refreshToken);
 
         // Redis에 저장된 리프레시 토큰과 비교
-        String storedRefreshToken = redisService.getData(email);
+        String storedRefreshToken = authRedisService.getData(email);
         if (!refreshToken.equals(storedRefreshToken)) {
             throw new MemberException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
@@ -68,6 +68,4 @@ public class LoginService {
 
         return newTokenResponse;
     }
-
-
 }

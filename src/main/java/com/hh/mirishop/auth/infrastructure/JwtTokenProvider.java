@@ -77,8 +77,9 @@ public class JwtTokenProvider {
             if (!validateToken(token)) {
                 throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
             }
-            return Jwts.parser()
-                    .setSigningKey(secretKey)
+            return Jwts.parserBuilder()
+                    .setSigningKey(generateHmacShaKey(secretKey))
+                    .build()
                     .parseClaimsJws(token)
                     .getBody()
                     .get("memberEmail", String.class);
@@ -87,11 +88,25 @@ public class JwtTokenProvider {
         }
     }
 
+    public String extractEmailFromRefreshToken(String token) {
+        if (!validateToken(token)) {
+            throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
+        }
+        // 토큰에서 subject에 있는 email 반환
+        return Jwts.parserBuilder()
+                .setSigningKey(generateHmacShaKey(secretKey))
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
     public boolean validateToken(String token) {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException exception) {
+            System.out.println("일로 빠지나?");
             throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
         }
     }
