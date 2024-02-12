@@ -1,10 +1,11 @@
 package com.hh.mirishop.like.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
+@Builder
 public class LikeResponse {
-    private int likesCount;
+
+    private Long postId;
 }

@@ -15,8 +15,6 @@ public class ActivityResponse {
     private Long memberNumber;
     private ActivityType activityType;
     private Long activityId;
-    private String title;
-    private String content;
     private LocalDateTime createdAt;
 
     public static ActivityResponse fromActivity(Activity activity) {
@@ -25,8 +23,6 @@ public class ActivityResponse {
                 activity.getMemberNumber(),
                 activity.getActivityType(),
                 activity.getActivityId(),
-                activity.getTitle(),
-                activity.getContent(),
                 activity.getCreatedAt()
         );
     }
