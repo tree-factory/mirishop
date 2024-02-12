@@ -80,6 +80,12 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new CommentException(ErrorCode.POST_NOT_FOUND));
     }
 
+    @Override
+    @Transactional
+    public List<Long> findCommentIdsByMemberNumber(Long memberNumber) {
+        return commentRepository.findCommentIdsByMemberNumber(memberNumber);
+    }
+
     @Transactional
     public Integer countLikeForComment(Long commentId) {
         return likeRepository.countByItemIdAndLikeType(commentId, LikeType.COMMENT);
@@ -103,10 +109,6 @@ public class CommentServiceImpl implements CommentService {
     private Member findMemberByNumber(Long memberNumber) {
         return memberRepository.findById(memberNumber)
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
-    }
-
-    public List<Comment> getCommentsByPostId(Long postId) {
-        return commentRepository.findByPostId(postId);
     }
 
     private void checkAuthorizedMember(Long currentMemberNumber, Comment comment) {

@@ -6,9 +6,11 @@ import com.hh.mirishop.follow.entity.Follow;
 import com.hh.mirishop.follow.repository.FollowRepository;
 import com.hh.mirishop.like.domain.LikeType;
 import com.hh.mirishop.like.entity.Like;
+import com.hh.mirishop.like.repository.LikeRepository;
 import com.hh.mirishop.newsfeed.domain.ActivityType;
 import com.hh.mirishop.newsfeed.dto.ActivityResponse;
 import com.hh.mirishop.newsfeed.entity.Activity;
+import com.hh.mirishop.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,6 +32,8 @@ import java.util.List;
 public class NewsFeedServiceImpl implements NewsFeedService {
 
     private final CommentService commentService;
+    private final PostRepository postRepository;
+    private final LikeRepository likeRepository;
     private final FollowRepository followRepository;
     private final MongoTemplate mongoTemplate;
 
@@ -38,30 +43,73 @@ public class NewsFeedServiceImpl implements NewsFeedService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Long currentMemberNumber = userDetails.getNumber();
 
-        // 유저의 팔로잉 사용자 조회
-        List<Follow> followings = followRepository.findAllByFollowerId(currentMemberNumber);
+        // 팔로우 유저에 대한 정보
+        List<Activity> activitiesForFollows = getActivitiesForFollowing(currentMemberNumber);
+        // 나의 글에 달린 댓글과 좋아요에 대한 정보
+        List<Activity> activitiesForMyPosts = getActivitiesForMyPosts(currentMemberNumber);
+        // 다른 글에 달은 댓글과 좋아요에 대한 정보
+        List<Activity> activitiesForOtherPosts = getActivitiesForOtherPosts(currentMemberNumber);
+        // 대댓글과 대댓글에 대한 좋아요에 대한 정보
+        List<Activity> activitiesForReplies = getActivitiesForReplies(currentMemberNumber);
 
+        //
+        List<Activity> activities = new ArrayList<>();
+        activities.addAll(activitiesForFollows);
+        activities.addAll(activitiesForMyPosts);
+        activities.addAll(activitiesForOtherPosts);
+        activities.addAll(activitiesForReplies);
+
+        List<ActivityResponse> activityResponses = activities.stream().map(ActivityResponse::fromActivity).toList();
+
+        return new PageImpl<>(activityResponses, pageable, activities.size());
+    }
+
+    private List<Activity> getActivitiesForFollowing(Long currentMemberNumber) {
+        List<Follow> followings = followRepository.findAllByFollowerId(currentMemberNumber);
         List<Long> followingMemberNumbers = followings.stream()
                 .map(follow -> follow.getFollowing().getNumber())
                 .toList();
 
-        // 팔로잉하는 사용자들의 활동 중 삭제되지 않은 것들만 조회
-        Query query = new Query();
-        query.addCriteria(new Criteria().andOperator(
-                        Criteria.where("memberNumber").in(followingMemberNumbers),
+        Query queryForFollows = new Query(Criteria.where("memberNumber").in(followingMemberNumbers)
+                        .andOperator(
+                            Criteria.where("isDeleted").is(false)
+                ));
+
+        return mongoTemplate.find(queryForFollows, Activity.class, "activities");
+    }
+
+    private List<Activity> getActivitiesForMyPosts(Long currentMemberNumber) {
+        List<Long> myPostIds = postRepository.findByMemberNumberAndIsDeletedFalse(currentMemberNumber);
+
+        Query queryForMyPosts = new Query(Criteria.where("targetPostId").in(myPostIds)
+                .andOperator(
+                        Criteria.where("activityType").in(ActivityType.COMMENT, ActivityType.LIKE),
                         Criteria.where("isDeleted").is(false)
-                ))
-                .skip(page * size).limit(size);
+                ));
 
-        long total = mongoTemplate.count(query, Activity.class, "activities");
+        return mongoTemplate.find(queryForMyPosts, Activity.class, "activities");
+    }
 
-        List<Activity> activities = mongoTemplate.find(query, Activity.class, "activities");
+    private List<Activity> getActivitiesForOtherPosts(Long currentMemberNumber) {
+        Query queryForOtherPosts = new Query(Criteria.where("memberNumber").is(currentMemberNumber)
+                .andOperator(
+                        Criteria.where("activityType").in(ActivityType.COMMENT, ActivityType.LIKE),
+                        Criteria.where("isDeleted").is(false)
+                ));
+        return mongoTemplate.find(queryForOtherPosts, Activity.class, "activities");
+    }
 
-        List<ActivityResponse> activityResponses = activities.stream()
-                .map(ActivityResponse::fromActivity)
-                .toList();
+    private List<Activity> getActivitiesForReplies(Long currentMemberNumber) {
+        System.out.println(3);
+        List<Long> commentIds = commentService.findCommentIdsByMemberNumber(currentMemberNumber);
 
-        return new PageImpl<>(activityResponses, pageable, total);
+        Query queryForRepliesAndLikes = new Query(Criteria.where("parentCommentId").in(commentIds)
+                .andOperator(
+                        Criteria.where("activityType").in(ActivityType.COMMENT, ActivityType.LIKE),
+                        Criteria.where("isDeleted").is(false)
+                ));
+
+        return mongoTemplate.find(queryForRepliesAndLikes, Activity.class, "activities");
     }
 
     @Override
@@ -88,6 +136,7 @@ public class NewsFeedServiceImpl implements NewsFeedService {
     public void deleteActivityForUnlike(Like like) {
         Long postId = findRelatedPostIdForLike(like);
 
+        // 타입이 LIKE 인 것 중에서 postId를 기준으로 삭제
         Query query = new Query(Criteria
                 .where("activityType").is(ActivityType.LIKE)
                 .and("activityId").is(postId));
