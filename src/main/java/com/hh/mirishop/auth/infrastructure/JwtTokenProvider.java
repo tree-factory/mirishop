@@ -4,7 +4,6 @@ import com.hh.mirishop.auth.dto.TokenResponse;
 import com.hh.mirishop.common.exception.ErrorCode;
 import com.hh.mirishop.common.exception.JwtTokenException;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -77,12 +76,14 @@ public class JwtTokenProvider {
             if (!validateToken(token)) {
                 throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
             }
-            return Jwts.parser()
-                    .setSigningKey(secretKey)
+            // 토큰에서 subject에 있는 email 반환
+            return Jwts.parserBuilder()
+                    .setSigningKey(generateHmacShaKey(secretKey))
+                    .build()
                     .parseClaimsJws(token)
                     .getBody()
-                    .get("memberEmail", String.class);
-        } catch (NumberFormatException e) {
+                    .getSubject();
+        } catch (JwtException | IllegalArgumentException e) {
             throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
         }
     }
@@ -93,14 +94,6 @@ public class JwtTokenProvider {
             return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException exception) {
             throw new JwtTokenException(ErrorCode.INVALID_TOKEN);
-        }
-    }
-
-    public Claims parseClaims(String accessToken) {
-        try {
-            return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(accessToken).getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
         }
     }
 }
