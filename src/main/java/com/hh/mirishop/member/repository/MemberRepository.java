@@ -1,6 +1,5 @@
 package com.hh.mirishop.member.repository;
 
-
 import com.hh.mirishop.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -32,7 +32,6 @@ public class LoginController {
     */
     @PostMapping("/refreshToken")
     public ResponseEntity<TokenResponse> reissueToken(@RequestBody TokenRequest tokenRequest) {
-        System.out.println(tokenRequest.getRefreshToken());
         TokenResponse token = loginService.reissue(tokenRequest.getRefreshToken());
         return ResponseEntity.ok(token);
     }

@@ -56,7 +56,7 @@ public class LoginService {
         }
 
         // 리프레시 토큰으로부터 사용자 정보 추출
-        String email = jwtTokenProvider.extractEmailFromToken(refreshToken);
+        String email = jwtTokenProvider.extractEmailFromRefreshToken(refreshToken);
 
         // Redis에 저장된 리프레시 토큰과 비교
         String storedRefreshToken = authRedisService.getData(email);
