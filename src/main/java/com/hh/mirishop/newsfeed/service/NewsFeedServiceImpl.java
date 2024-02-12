@@ -6,7 +6,6 @@ import com.hh.mirishop.follow.entity.Follow;
 import com.hh.mirishop.follow.repository.FollowRepository;
 import com.hh.mirishop.like.domain.LikeType;
 import com.hh.mirishop.like.entity.Like;
-import com.hh.mirishop.like.repository.LikeRepository;
 import com.hh.mirishop.newsfeed.domain.ActivityType;
 import com.hh.mirishop.newsfeed.dto.ActivityResponse;
 import com.hh.mirishop.newsfeed.entity.Activity;
@@ -24,8 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -33,14 +33,15 @@ public class NewsFeedServiceImpl implements NewsFeedService {
 
     private final CommentService commentService;
     private final PostRepository postRepository;
-    private final LikeRepository likeRepository;
     private final FollowRepository followRepository;
     private final MongoTemplate mongoTemplate;
 
+    /*
+    Todo: query문을 어떻게 최적화 할지 고민
+    */
     @Override
     @Transactional(readOnly = true)
     public Page<ActivityResponse> getNewsfeedForMember(int page, int size, UserDetailsImpl userDetails) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Long currentMemberNumber = userDetails.getNumber();
 
         // 팔로우 유저에 대한 정보
@@ -53,15 +54,17 @@ public class NewsFeedServiceImpl implements NewsFeedService {
         List<Activity> activitiesForReplies = getActivitiesForReplies(currentMemberNumber);
 
         //
-        List<Activity> activities = new ArrayList<>();
-        activities.addAll(activitiesForFollows);
-        activities.addAll(activitiesForMyPosts);
-        activities.addAll(activitiesForOtherPosts);
-        activities.addAll(activitiesForReplies);
+        List<Activity> activities = Stream.of(activitiesForFollows, activitiesForMyPosts, activitiesForOtherPosts,
+                        activitiesForReplies)
+                .flatMap(Collection::stream)
+                .toList();
+
+        int totalActivities = activities.size();
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         List<ActivityResponse> activityResponses = activities.stream().map(ActivityResponse::fromActivity).toList();
 
-        return new PageImpl<>(activityResponses, pageable, activities.size());
+        return new PageImpl<>(activityResponses, pageable, totalActivities);
     }
 
     private List<Activity> getActivitiesForFollowing(Long currentMemberNumber) {
@@ -71,8 +74,8 @@ public class NewsFeedServiceImpl implements NewsFeedService {
                 .toList();
 
         Query queryForFollows = new Query(Criteria.where("memberNumber").in(followingMemberNumbers)
-                        .andOperator(
-                            Criteria.where("isDeleted").is(false)
+                .andOperator(
+                        Criteria.where("isDeleted").is(false)
                 ));
 
         return mongoTemplate.find(queryForFollows, Activity.class, "activities");

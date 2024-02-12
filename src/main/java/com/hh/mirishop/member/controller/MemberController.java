@@ -90,7 +90,7 @@ public class MemberController {
     /*
     유저 정보 수정
     */
-    @PatchMapping("/{id}")
+    @PatchMapping
     public ResponseEntity<BaseResponse<Void>> update(
             @Valid @RequestBody MemberUpdateRequest memberUpdateRequest, @AuthenticationPrincipal
     UserDetailsImpl userDetails) {
@@ -101,7 +101,7 @@ public class MemberController {
     /*
     비밀번호 정보 수정
     */
-    @PutMapping("/{id}/password")
+    @PutMapping("/password")
     public ResponseEntity<BaseResponse<Void>> changePassword(
             @Valid @RequestBody ChangePasswordRequest changePasswordRequest, @AuthenticationPrincipal
     UserDetailsImpl userDetails) {
