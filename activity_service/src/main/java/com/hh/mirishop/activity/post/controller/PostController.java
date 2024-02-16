@@ -7,7 +7,6 @@ import com.hh.mirishop.activity.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,10 +50,10 @@ public class PostController {
     @GetMapping
     public ResponseEntity<BaseResponse<Page<PostResponse>>> getAllPosts(@RequestParam("page") int page,
                                                                         @RequestParam("size") int size,
-                                                                        @RequestParam Long currentMemberNumber) {
+                                                                        @RequestParam(name = "member") Long currentMemberNumber) {
         Page<PostResponse> postList = postService.getAllpostsByMember(page - 1, size, currentMemberNumber);
 
-        return new ResponseEntity<>(BaseResponse.of("게시글 목록 조회 성공", true, postList), HttpStatus.OK);
+        return ResponseEntity.ok(BaseResponse.of("게시글 목록 조회 성공", true, postList));
     }
 
     /*
@@ -76,9 +75,9 @@ public class PostController {
     @PatchMapping("/{postId}")
     public ResponseEntity<BaseResponse<Void>> updatePost(@PathVariable("postId") Long postId,
                                                          @RequestBody PostRequest postRequest,
-                                                         @RequestParam Long currentMemberNumber) {
+                                                         @RequestParam(name = "member") Long currentMemberNumber) {
         postService.updatePost(postId, postRequest, currentMemberNumber);
-        return new ResponseEntity<>(BaseResponse.of("게시글이 업데이트되었습니다.", true, null), HttpStatus.OK);
+        return ResponseEntity.ok(BaseResponse.of("게시글이 업데이트되었습니다.", true, null));
     }
 
     /*
@@ -86,8 +85,8 @@ public class PostController {
     */
     @DeleteMapping("/{postId}")
     public ResponseEntity<BaseResponse<Void>> deletePost(@PathVariable("postId") Long postId,
-                                                         @RequestParam Long currentMemberNumber) {
+                                                         @RequestParam(name = "member") Long currentMemberNumber) {
         postService.deletePost(postId, currentMemberNumber);
-        return new ResponseEntity<>(BaseResponse.of("게시글이 삭제되었습니다.", true, null), HttpStatus.OK);
+        return ResponseEntity.ok(BaseResponse.of("게시글이 삭제되었습니다.", true, null));
     }
 }

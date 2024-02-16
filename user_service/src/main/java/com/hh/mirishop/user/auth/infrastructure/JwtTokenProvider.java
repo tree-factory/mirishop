@@ -29,12 +29,12 @@ public class JwtTokenProvider {
     @Value("${security.jwt.refreshtokenValid-time}")
     private long refreshTokenValidTime;
 
-    public TokenResponse generateTokenResponse(String memberEmail) {
+    public TokenResponse generateTokenResponse(Long memberNumber, String memberEmail) {
         Date now = new Date();
         Date accessTokenValidity = new Date(now.getTime() + validTime);
         Date refreshTokenValidity = new Date(now.getTime() + refreshTokenValidTime);
 
-        String accessToken = createToken(memberEmail, accessTokenValidity);
+        String accessToken = createToken(memberNumber, memberEmail, accessTokenValidity);
         String refreshToken = createRefreshToken(memberEmail, refreshTokenValidity);
 
         return TokenResponse.builder()
@@ -44,8 +44,9 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    public String createToken(String memberEmail, Date validity) {
+    public String createToken(Long memberNumber, String memberEmail, Date validity) {
         Claims claims = Jwts.claims();
+        claims.put("memberNumber", memberNumber);
         claims.put("memberEmail", memberEmail);
 
         return Jwts.builder()

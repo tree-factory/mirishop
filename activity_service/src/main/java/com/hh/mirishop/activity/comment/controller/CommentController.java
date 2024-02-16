@@ -30,7 +30,7 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<BaseResponse<Void>> createComment(@Valid @RequestBody CommentRequest commentRequest,
                                                             @PathVariable("postId") Long postId,
-                                                            @RequestParam Long currentMemberNumber) {
+                                                            @RequestParam("member") Long currentMemberNumber) {
         Long commentId = commentService.createCommentOrReply(commentRequest, currentMemberNumber, postId);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -46,8 +46,8 @@ public class CommentController {
     */
     @DeleteMapping("/{commentId}")
     public ResponseEntity<BaseResponse<Void>> deleteComment(@PathVariable("commentId") Long commentId,
-                                                            @RequestParam Long currentMemberNumber) {
-        commentService.deleteComment(commentId,currentMemberNumber);
+                                                            @RequestParam("member") Long currentMemberNumber) {
+        commentService.deleteComment(commentId, currentMemberNumber);
         return ResponseEntity.ok(BaseResponse.of("댓글이 삭제되었습니다.", true, null));
     }
 
@@ -57,7 +57,7 @@ public class CommentController {
     @PostMapping("/reply")
     public ResponseEntity<BaseResponse<Void>> createReply(@Valid @RequestBody CommentRequest commentRequest,
                                                           @PathVariable("postId") Long postId,
-                                                          @RequestParam Long currentMemberNumber) {
+                                                          @RequestParam("member") Long currentMemberNumber) {
         Long commentId = commentService.createCommentOrReply(commentRequest, currentMemberNumber, postId);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()

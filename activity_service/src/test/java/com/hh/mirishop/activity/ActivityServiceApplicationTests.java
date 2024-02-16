@@ -1,10 +1,10 @@
-package com.hh.mirishop;
+package com.hh.mirishop.activity;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class MirishopApplicationTests {
+class ActivityServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

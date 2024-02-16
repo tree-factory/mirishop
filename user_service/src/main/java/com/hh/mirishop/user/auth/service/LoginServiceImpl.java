@@ -34,7 +34,7 @@ public class LoginServiceImpl implements LoginService {
 
         validatePassword(password, member);
 
-        return getNewTokenResponse(email);
+        return getNewTokenResponse(member.getNumber(), member.getEmail());
     }
 
     @Override
@@ -54,14 +54,17 @@ public class LoginServiceImpl implements LoginService {
             throw new JwtTokenException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        return getNewTokenResponse(email);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return getNewTokenResponse(member.getNumber(), email);
     }
 
     /*
     accessToken, refreshToken을 모두 재발급하여, 기존 refreshToken 사용을 만료시킴
     */
-    private TokenResponse getNewTokenResponse(String email) {
-        TokenResponse newTokenResponse = jwtTokenProvider.generateTokenResponse(email);
+    private TokenResponse getNewTokenResponse(Long memberNumber, String email) {
+        TokenResponse newTokenResponse = jwtTokenProvider.generateTokenResponse(memberNumber, email);
         authRedisService.setDataExpire(email, newTokenResponse.getRefreshToken(), 3 * 24 * 60 * 60L);
         return newTokenResponse;
     }
