@@ -1,6 +1,5 @@
 rootProject.name = 'mirishop'
 
 include 'apigateway_service'
-include 'user_service'
 include 'newsfeed_service'
 include 'activity_service'

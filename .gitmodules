@@ -1,0 +1,3 @@
+[submodule "userService"]
+	path = userService
+	url = https://github.com/mirishop/user_service.git
