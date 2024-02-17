@@ -1,3 +1,9 @@
 [submodule "userService"]
 	path = userService
 	url = https://github.com/mirishop/user_service.git
+[submodule "activityService"]
+	path = activityService
+	url = https://github.com/mirishop/activity_service.git
+[submodule "newsfeedService"]
+	path = newsfeedService
+	url = https://github.com/mirishop/newsfeed_service.git
