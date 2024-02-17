@@ -7,3 +7,6 @@
 [submodule "newsfeedService"]
 	path = newsfeedService
 	url = https://github.com/mirishop/newsfeed_service.git
+[submodule "apiGateway"]
+	path = apiGateway
+	url = https://github.com/mirishop/api_gateway.git
