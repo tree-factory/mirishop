@@ -10,3 +10,6 @@
 [submodule "apiGateway"]
 	path = apiGateway
 	url = https://github.com/mirishop/api_gateway.git
+[submodule "productManagementService"]
+	path = productManagementService
+	url = https://github.com/mirishop/productmanagement_service.git
