@@ -42,6 +42,20 @@
 - 뉴스피드 영역에서 사용자별 팔로우 유저의 활동을 볼 수 있습니다.
 - 뉴스피드 영역에서 사용자별  활동에 대한 정보를 볼 수 있습니다.
 
+### productmanagement_service
+
+> 스택 : Java 17, Spring Boot 3.2.2, MySQL
+
+#### 주요기능
+- 일반상품과 예약상품을 등록,수정,삭제,조회를 할 수 있습니다.
+
+### orderpayment_service
+
+> 스택 : Java 17, Spring Boot 3.2.2, MySQL
+
+#### 주요기능
+- update 예정....
+
 ### 프로젝트 설치 및 실행방법
 1. github에서 파일을 내려받습니다.
 2. CLI로 docker를 이용하여 실행합니다.
@@ -53,4 +67,5 @@
      ~~~
 
 ### ERD 테이블
-![image](https://github.com/noyes5/mirishop/assets/116651434/77a966cd-3a03-4f95-a078-0fa71cbbd6cc)
+![mirishop(2)](https://github.com/mirishop/mirishop/assets/116651434/0789f4fa-adeb-4e1f-b59e-df6ebc707c4c)
+
