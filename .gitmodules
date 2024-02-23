@@ -13,3 +13,6 @@
 [submodule "productManagementService"]
 	path = productManagementService
 	url = https://github.com/mirishop/productmanagement_service.git
+[submodule "orderPaymentService"]
+	path = orderPaymentService
+	url = https://github.com/mirishop/orderpayment_service.git
