@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  database:
+    container_name: mysql_db
+    image: mysql:8.0.36
+    env_file: .env
+    ports:
+      - "3307:3306"
+    restart: on-failure
+    volumes:
+      - ./database/config:/etc/mysql/conf.d
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+  redis:
+    container_name: redis_server
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: on-failure
+    volumes:
+      - ./redis/data:/data
+
+  redis_auth:
+    container_name: redis_auth_server
+    image: redis:latest
+    ports:
+      - "6380:6379"
+    restart: on-failure
+    volumes:
+      - ./redis_auth/data:/data
+
+  mongodb:
+    container_name: mongodb_server
+    image: mongo:latest
+    env_file: .env
+    ports:
+      - "27017:27017"
+    restart: on-failure
+    volumes:
+      - ./mongodb/data/db:/data/db
+      - ./mongodb/  configdb:/data/configdb
+    command: mongod --auth
+
+#  spring-boot-app:
+#    build: ./
+#    ports:
+#      - "8080:8080"
+#    restart: always
+#    depends_on:
+#      - database
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/mirishop
+#      - SPRING_DATASOURCE_USERNAME=root
+#      - SPRING_DATASOURCE_PASSWORD=1234
+#      - SPRING_JPA_HIBERNATE_DDL_AUTO=create
