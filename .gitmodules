@@ -1,12 +1,15 @@
 [submodule "userService"]
 	path = userService
 	url = https://github.com/mirishop/user_service.git
+    branch = main
 [submodule "activityService"]
 	path = activityService
 	url = https://github.com/mirishop/activity_service.git
+    branch = main
 [submodule "newsfeedService"]
 	path = newsfeedService
 	url = https://github.com/mirishop/newsfeed_service.git
+    branch = main
 [submodule "apiGateway"]
 	path = apiGateway
 	url = https://github.com/mirishop/api_gateway.git
@@ -14,6 +17,8 @@
 [submodule "productManagementService"]
 	path = productManagementService
 	url = https://github.com/mirishop/productmanagement_service.git
+    branch = main
 [submodule "orderPaymentService"]
 	path = orderPaymentService
 	url = https://github.com/mirishop/orderpayment_service.git
+    branch = main
