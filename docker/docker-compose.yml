@@ -32,6 +32,15 @@ services:
     volumes:
       - ./redis_auth/data:/data
 
+  redis_cache_auth:
+    container_name: redis_cache_server
+    image: redis:latest
+    ports:
+      - "6381:6379"
+    restart: on-failure
+    volumes:
+      - ./redis_cache/data:/data
+
   mongodb:
     container_name: mongodb_server
     image: mongo:latest
